@@ -25,7 +25,6 @@ ADCWeapon::ADCWeapon() {
 	OurParticleSystem->AttachTo(SwordMesh);
 }
 
-
 UBoxComponent* ADCWeapon::GetCollisionComp() {
 	if (CollisionComp) {
 		return CollisionComp;
@@ -41,7 +40,6 @@ void ADCWeapon::OnCollision(UPrimitiveComponent* OverlappedComponent, AActor* Ot
 		CollisionComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 }
-
 
 void ADCWeapon::OnUnEquip() {
 	DetachFromPlayer();

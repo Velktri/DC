@@ -18,9 +18,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Config)
 	UStaticMeshComponent* LootMesh;
 
-	/** The loot inside the loogbag */
+	/** The loot inside the lootbag */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Loot)
-	class ADCItem* LootContents;
+	TSubclassOf<class ADCItem> LootContents;
 
 	/** Amount of money inside loot bag */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Loot)
@@ -28,7 +28,7 @@ public:
 
 	/** Returns the name of the loot contents */
 	UFUNCTION()
-	ADCItem* GetLootContents();
+	TSubclassOf<class ADCItem> GetLootContents();
 
 	/** Returns the amount of money in the loot */
 	UFUNCTION()

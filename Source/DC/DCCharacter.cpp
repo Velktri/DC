@@ -183,8 +183,14 @@ void ADCCharacter::MoveRight(float Value)
 ADCItem* ADCCharacter::ProcessLoot(AActor* OtherActor) {
 	ADCLoot* WeaponLoot = Cast<ADCLoot>(OtherActor);
 	if (WeaponLoot) {
-		ADCItem* Contents = WeaponLoot->GetLootContents();
-		return Contents;
+
+		ADCItem* Spawner = GetWorld()->SpawnActor<ADCItem>(WeaponLoot->GetLootContents());
+		if (Spawner && Spawner->IsA(ADCWeapon::StaticClass())) {
+			Cast<ADCWeapon>(Spawner)->SwordMesh->SetHiddenInGame(true);
+			Cast<ADCWeapon>(Spawner)->OurParticleSystem->SetHiddenInGame(true);
+
+			return Spawner;
+		}
 	}
 
 	return NULL;
@@ -193,7 +199,6 @@ ADCItem* ADCCharacter::ProcessLoot(AActor* OtherActor) {
 void ADCCharacter::EquipNextWeapon() {
 	if (Inventory.Num() == 0) {
 		UE_LOG(LogTemp, Warning, TEXT("You don't have any weapons in your Inventory."));
-		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "You don't have any weapons in your Inventory.");
 		return;
 	}
 
@@ -235,8 +240,6 @@ void ADCCharacter::EquipWeapon(int32 SlotPointer) {
 		}
 
 		UE_LOG(LogTemp, Warning, TEXT("SlotPointer: %d"), SlotPointer);
-		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::FromInt(SlotPointer));
-
 		EquippedItemSlot = SlotPointer;
 }
 
@@ -246,7 +249,6 @@ void ADCCharacter::PrintInventory() {
 		if (Weapon) {
 			FString string = "Slot " + FString::FromInt(i) + ": " + Weapon->GetItemName() + ".";
 			UE_LOG(LogTemp, Warning, TEXT("%s"), *string);
-			//GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Yellow, string);
 		}
 	}
 }
@@ -300,7 +302,6 @@ void ADCCharacter::LockOn() {
 		if (LockOnTarget != NULL) {
 			bIsLockedOn = true;
 			UE_LOG(LogTemp, Warning, TEXT("%s"), *LockOnTarget->GetName());
-			//GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Green, LockOnTarget->GetName());
 		}
 	}
 }
@@ -310,11 +311,9 @@ void ADCCharacter::OnCollision(UPrimitiveComponent* OverlappedComponent, AActor*
 		ADCItem* Contents = ProcessLoot(OtherActor);
 		if (Contents) {
 			UE_LOG(LogTemp, Warning, TEXT("You picked up a %s."), *Contents->GetItemName());
-			//GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, "You picked up a " + Contents->GetItemName() + ".");
 			Inventory.Add(Contents);
 		} else {
 			UE_LOG(LogTemp, Warning, TEXT("You picked up nothing."));
-			//GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, "You picked up nothing.");
 		}
 
 		OtherActor->Destroy();

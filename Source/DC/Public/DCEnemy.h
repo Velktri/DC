@@ -25,6 +25,14 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	/** Enemy's AI class */
+	UPROPERTY(EditAnywhere, Category = Behavior)
+	class UBehaviorTree* BotBehavior;
+
+	/** Enemy Sight Distance. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Behavior)
+	int32 SightDistance;
+
 	/** Current health of the Enemy. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Health)
 	int32 Health;
@@ -41,9 +49,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Loot)
 	TArray<int32> DropPercentage;
 
-	/** The loot inside the Enemy. */
+	/** The Enemy's Loot Reference. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Loot)
-	ADCItem* Item;
+	TSubclassOf<class ADCItem> LootChoice;
+
+	/** Select Loot */
+	void SpawnLoot();
 
 	/** Loot class that drops when enemy dies. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Loot)
