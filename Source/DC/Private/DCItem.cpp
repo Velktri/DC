@@ -20,12 +20,11 @@ FString ADCItem::GetItemName() {
 void ADCItem::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
-void ADCItem::SetOwningPawn(ADCCharacter* NewOwner) {
-	if (MyPawn != NewOwner) {
+void ADCItem::SetOwner(ADCPlayerController* NewOwner) {
+	if (MyOwner != NewOwner) {
 		//Instigator = NewOwner;
-		MyPawn = NewOwner;
+		MyOwner = NewOwner;
 	}
 }

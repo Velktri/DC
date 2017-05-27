@@ -20,16 +20,19 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Config)
 	FString ItemName;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Config)
+	UTexture* InventoryImage;
+
 	/** Get Weapon Name */
 	FString GetItemName();
 
 	/** Sets the item's owner */
-	void SetOwningPawn(ADCCharacter* NewOwner);
+	void SetOwner(class ADCPlayerController* NewOwner);
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 	/** Pawn owner */
-	class ADCCharacter* MyPawn;
+	class ADCPlayerController* MyOwner;
 };

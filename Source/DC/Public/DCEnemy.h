@@ -41,24 +41,20 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Name)
 	FString Name;
 
-	/** All Loot that can drop. */
+	/**  Drop percentage and loot reference. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Loot)
-	TArray<TSubclassOf<class ADCItem>> LootReference;
+	TMap<TSubclassOf<class ADCItem>, int32> Items;
 
-	/**  Drop percentage for the loot reference. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Loot)
-	TArray<int32> DropPercentage;
-
-	/** The Enemy's Loot Reference. */
+	/** The Spawned Enemy's Loot Reference. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Loot)
-	TSubclassOf<class ADCItem> LootChoice;
-
-	/** Select Loot */
-	void SpawnLoot();
+	TArray<TSubclassOf<class ADCItem>> SpawnedLoot;
 
 	/** Loot class that drops when enemy dies. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Loot)
 	TSubclassOf<class ADCLoot> LootBag;
+
+	/** Select Loot */
+	void SpawnLoot();
 
 	UFUNCTION()
 	void OnDeath();

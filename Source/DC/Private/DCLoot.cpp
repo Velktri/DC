@@ -12,7 +12,7 @@ ADCLoot::ADCLoot() {
 	LootMesh = CreateDefaultSubobject<UStaticMeshComponent>("Loot Mesh");
 }
 
-TSubclassOf<class ADCItem> ADCLoot::GetLootContents() {
+TArray<TSubclassOf<class ADCItem>> ADCLoot::GetLootContents() {
 	return LootContents;
 }
 

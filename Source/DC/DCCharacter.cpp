@@ -8,17 +8,13 @@
 #include "DCLoot.h"
 #include "DCEnemy.h"
 #include "EngineUtils.h"
+#include "DCPlayerController.h"
+#include "DCGameUIWidget.h"
 
 //////////////////////////////////////////////////////////////////////////
 // ADCCharacter
 
 ADCCharacter::ADCCharacter() {
-	/* Character is spawned without any weapon equipped */
-	CurrentWeapon = NULL;
-	EquippedItemSlot = -10;
-
-	/* Generate an empty Inventory */
-	Inventory.SetNum(MaxInventorySize, false);
 
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
@@ -61,6 +57,8 @@ ADCCharacter::ADCCharacter() {
 void ADCCharacter::BeginPlay() {
 	Super::BeginPlay();
 	ActionState = ECharState::I;
+	CurrentHealth = Health;
+	CurrentEnergy = Energy;
 }
 
 void ADCCharacter::Tick(float DeltaSeconds) {
@@ -110,10 +108,7 @@ void ADCCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputC
 	PlayerInputComponent->BindAction("ResetVR", IE_Pressed, this, &ADCCharacter::OnResetVR);
 
 	/** Weapon swapping */
-	InputComponent->BindAction("NextWeapon", IE_Pressed, this, &ADCCharacter::EquipNextWeapon);
-
-	/** Testing Inputs */
-	InputComponent->BindAction("PrintInventory", IE_Pressed, this, &ADCCharacter::PrintInventory);
+	//InputComponent->BindAction("NextWeapon", IE_Pressed, this, &ADCCharacter::EquipNextWeapon);
 
 	/** Lock on to targets */
 	InputComponent->BindAction("LockOn", IE_Pressed, this, &ADCCharacter::LockOn);
@@ -180,103 +175,56 @@ void ADCCharacter::MoveRight(float Value)
 }
 
 
-ADCItem* ADCCharacter::ProcessLoot(AActor* OtherActor) {
+void ADCCharacter::ProcessLoot(AActor* OtherActor) {
 	ADCLoot* WeaponLoot = Cast<ADCLoot>(OtherActor);
 	if (WeaponLoot) {
+		TArray<TSubclassOf<ADCItem>> lootItems = WeaponLoot->GetLootContents();
+		for (TSubclassOf<ADCItem> loot : lootItems) {
+			ADCItem* Spawner = GetWorld()->SpawnActor<ADCItem>(loot);
 
-		ADCItem* Spawner = GetWorld()->SpawnActor<ADCItem>(WeaponLoot->GetLootContents());
-		if (Spawner && Spawner->IsA(ADCWeapon::StaticClass())) {
-			Cast<ADCWeapon>(Spawner)->SwordMesh->SetHiddenInGame(true);
-			Cast<ADCWeapon>(Spawner)->OurParticleSystem->SetHiddenInGame(true);
+			if (Spawner && Spawner->IsA(ADCWeapon::StaticClass())) {
+				Cast<ADCWeapon>(Spawner)->SwordMesh->SetHiddenInGame(true);
+				Cast<ADCWeapon>(Spawner)->OurParticleSystem->SetHiddenInGame(true);
 
-			return Spawner;
-		}
-	}
-
-	return NULL;
-}
-
-void ADCCharacter::EquipNextWeapon() {
-	if (Inventory.Num() == 0) {
-		UE_LOG(LogTemp, Warning, TEXT("You don't have any weapons in your Inventory."));
-		return;
-	}
-
-	int32 SlotPointer = EquippedItemSlot;
-	if (SlotPointer == (Inventory.Num() - 1)) {
-		SlotPointer = -1;
-	}
-
-	if (SlotPointer == -10) {
-		EquipWeapon(0);
-	} else if (Inventory.Num() == 1) {
-		EquipWeapon(0);
-	} else {
-		EquipWeapon(SlotPointer + 1);
-	}
-}
-
-void ADCCharacter::EquipWeapon(int32 SlotPointer) {
-		for (int32 i = 0; i < MaxInventorySize; i++) {
-			
-			int32 curr = (SlotPointer + i) % MaxInventorySize;
-			check(Inventory[curr] != nullptr)
-			if (Inventory[curr]->IsA(ADCWeapon::StaticClass())) {
-				if (CurrentWeapon != NULL) {
-					CurrentWeapon->OnUnEquip();
-					CurrentWeapon = Cast<ADCWeapon>(Inventory[curr]);
-					EquippedItemSlot = curr;
-					CurrentWeapon->SetOwningPawn(this);
-					CurrentWeapon->OnEquip();
-				} else {
-					CurrentWeapon = Cast<ADCWeapon>(Inventory[curr]);
-					EquippedItemSlot = curr;
-					CurrentWeapon->SetOwningPawn(this);
-					CurrentWeapon->OnEquip();
-
+				AController* PC = GetController();
+				if (PC)
+				{
+					Cast<ADCPlayerController>(PC)->AddToInventory(Spawner);
 				}
-				break;
 			}
-		}
-
-		UE_LOG(LogTemp, Warning, TEXT("SlotPointer: %d"), SlotPointer);
-		EquippedItemSlot = SlotPointer;
-}
-
-void ADCCharacter::PrintInventory() {
-	for (int32 i = Inventory.Num() - 1; i >= 0; i--) {
-		ADCItem* Weapon = Inventory[i];
-		if (Weapon) {
-			FString string = "Slot " + FString::FromInt(i) + ": " + Weapon->GetItemName() + ".";
-			UE_LOG(LogTemp, Warning, TEXT("%s"), *string);
 		}
 	}
 }
 
 void ADCCharacter::Attack() {
-	if (CurrentWeapon != NULL && ActionState == ECharState::I) {
-		ActionState = ECharState::A;
+	if (GetController() && GetController()->IsA(ADCPlayerController::StaticClass())) {
+		ADCWeapon* Weapon = Cast<ADCPlayerController>(GetController())->CurrentWeapon;
+		if (Weapon != NULL && ActionState == ECharState::I) {
+			ActionState = ECharState::A;
 
-		UBoxComponent* WeaponCollision = CurrentWeapon->GetCollisionComp();
-		if (WeaponCollision) {
-			CurrentWeapon->GetCollisionComp()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+			UBoxComponent* WeaponCollision = Weapon->GetCollisionComp();
+			if (WeaponCollision) {
+				Weapon->GetCollisionComp()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+			}
+			EndAttack();
+			//float AttackDuration = 0.0f;
+			//if (HorzontalSlash) {
+			//	AttackDuration = PlayAnimMontage(HorzontalSlash);
+			//}
+
+			//if (AttackDuration > 0.f) {
+			//	FTimerHandle TimerHandle;
+			//	GetWorldTimerManager().SetTimer(TimerHandle, this, &ADCCharacter::EndAttack, AttackDuration, false);
+			//}
 		}
-		EndAttack();
-		//float AttackDuration = 0.0f;
-		//if (HorzontalSlash) {
-		//	AttackDuration = PlayAnimMontage(HorzontalSlash);
-		//}
-
-		//if (AttackDuration > 0.f) {
-		//	FTimerHandle TimerHandle;
-		//	GetWorldTimerManager().SetTimer(TimerHandle, this, &ADCCharacter::EndAttack, AttackDuration, false);
-		//}
 	}
 }
 
 void ADCCharacter::EndAttack() {
-	ActionState = ECharState::I;
-	CurrentWeapon->GetCollisionComp()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	if (GetController() && GetController()->IsA(ADCPlayerController::StaticClass())) {
+		ActionState = ECharState::I;
+		Cast<ADCPlayerController>(GetController())->CurrentWeapon->GetCollisionComp()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
 }
 
 void ADCCharacter::LockOn() {
@@ -308,13 +256,7 @@ void ADCCharacter::LockOn() {
 
 void ADCCharacter::OnCollision(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult) {
 	if (OtherActor->IsA(ADCLoot::StaticClass())) {
-		ADCItem* Contents = ProcessLoot(OtherActor);
-		if (Contents) {
-			UE_LOG(LogTemp, Warning, TEXT("You picked up a %s."), *Contents->GetItemName());
-			Inventory.Add(Contents);
-		} else {
-			UE_LOG(LogTemp, Warning, TEXT("You picked up nothing."));
-		}
+		ProcessLoot(OtherActor);
 
 		OtherActor->Destroy();
 	}

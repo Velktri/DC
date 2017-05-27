@@ -4,6 +4,7 @@
 #include "DCWeapon.h"
 #include "DCCharacter.h"
 #include "DCEnemy.h"
+#include "DCPlayerController.h"
 
 ADCWeapon::ADCWeapon() {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
@@ -51,14 +52,13 @@ void ADCWeapon::OnEquip() {
 }
 
 void ADCWeapon::AttachToPlayer() {
-	if (MyPawn) {
+	if (MyOwner) {
 		DetachFromPlayer();
 
-		USkeletalMeshComponent* Character = MyPawn->GetMesh();
+		USkeletalMeshComponent* Character = Cast<ADCCharacter>(MyOwner->GetControlledPawn())->GetMesh();
 		SwordMesh->SetHiddenInGame(false);
 		OurParticleSystem->SetHiddenInGame(false);
 		SwordMesh->AttachTo(Character, "weapon_r", EAttachLocation::SnapToTarget, true);
-		//SwordMesh->AttachTo(Character, "weapon_r");
 	}
 }
 

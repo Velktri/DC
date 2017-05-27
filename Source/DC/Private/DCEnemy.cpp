@@ -30,31 +30,29 @@ void ADCEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) 
 }
 
 void ADCEnemy::SpawnLoot() {
-	if (LootReference.Num() > 0 && DropPercentage.Num() > 0) {
-		if (LootReference.Num() == DropPercentage.Num()) {
-			int32 RandomNumber = FMath::RandRange(1, 100);
-			LootChoice = NULL;
-			for (int32 i = 0; i < DropPercentage.Num(); i++) {
-				if (RandomNumber <= DropPercentage[i]) {
-					LootChoice = LootReference[i];
-					break;
-				}
-			}
-		} else {
-			UE_LOG(LogTemp, Warning, TEXT("Loot Reference and Drop Percentage mismatch error."));
+	TArray<TSubclassOf<class ADCItem>> lootArray;
+	Items.GenerateKeyArray(lootArray);
+	int32 NumItems = lootArray.Num();
+	for (int32 i = 0; i < NumItems; i++) {
+		if ((FMath::RandRange(0, 100)) <= Items[lootArray[i]]) {
+			SpawnedLoot.Add(lootArray[i]);
 		}
 	}
 }
 
 void ADCEnemy::OnDeath() {
-	FVector DeathLoc = GetActorLocation();
-	DeathLoc.Z -= 90.0f;
-	FRotator DeathRot = GetActorRotation();
-	ADCLoot* LootSpawn = GetWorld()->SpawnActor<ADCLoot>(LootBag, DeathLoc, DeathRot);
-	LootSpawn->LootContents = LootChoice;
-	
+	if (LootBag) {
+		FVector loc = FVector(-1570, -260, 410);
+		ADCLoot* LootSpawn = GetWorld()->SpawnActor<ADCLoot>(LootBag, loc/*GetActorLocation()*/, GetActorRotation());
+
+		if (LootSpawn) {
+			LootSpawn->LootContents = SpawnedLoot;
+		}
+	}
+
+
 	// destroy enemy and animations
-	this->Destroy();
+	Destroy();
 }
 
 void ADCEnemy::EnemyTakeDamage(int32 Damage) {

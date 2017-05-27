@@ -43,7 +43,14 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
 	int32 Critical;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
+	int32 Experience;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
+	int32 Level;
 	
+	/** What happens when an item is unequipped */
 	void OnUnEquip();
 
 	/** What happens when an item is equipped */

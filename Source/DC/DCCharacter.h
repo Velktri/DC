@@ -42,34 +42,29 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	float BaseLookUpRate;
 
-	/** Current Weapon the character is holding. */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon)
-	class ADCWeapon* CurrentWeapon;
+	///** Current Weapon the character is holding. */
+	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Inventory)
+	//class ADCWeapon* CurrentWeapon;
 
-	/** Inventory for the Character. */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Inventory)
-	TArray<class ADCItem*> Inventory;
-
-	/** Current health of the Pawn. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Health)
+	/** Max health of the Pawn. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
 	int32 Health;
 
-	/** Max Inventory size for the Character */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Inventory)
-	int32 MaxInventorySize;
+	/** Current health of the Pawn. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
+	int32 CurrentHealth;
+
+	/** Max Energy of the Pawn. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
+	int32 Energy;
+
+	/** Current Energy of the Pawn. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
+	int32 CurrentEnergy;
 
 	/** Determine what is in the lootbag. */
 	UFUNCTION()
-	ADCItem* ProcessLoot(AActor* OtherActor);
-
-	UFUNCTION()
-	void EquipNextWeapon();
-
-	UFUNCTION()
-	void EquipWeapon(int32 SlotPointer);
-
-	/** Print the current inventory */
-	void PrintInventory();
+	void ProcessLoot(AActor* OtherActor);
 
 	void Attack();
 
@@ -98,7 +93,6 @@ protected:
 
 	UFUNCTION()
 	void OnCollision(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult);
-
 
 	/** Resets HMD orientation in VR. */
 	void OnResetVR();

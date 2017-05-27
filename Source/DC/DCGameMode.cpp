@@ -3,6 +3,7 @@
 #include "DC.h"
 #include "DCGameMode.h"
 #include "DCCharacter.h"
+#include "DCPlayerController.h"
 
 ADCGameMode::ADCGameMode()
 {
@@ -12,4 +13,6 @@ ADCGameMode::ADCGameMode()
 	{
 		DefaultPawnClass = PlayerPawnBPClass.Class;
 	}
+
+	PlayerControllerClass = ADCPlayerController::StaticClass();
 }
