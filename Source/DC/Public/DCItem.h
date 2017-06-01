@@ -23,6 +23,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Config)
 	UTexture* InventoryImage;
 
+	/** Animation to play in the Start Menu. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
+	UAnimSequence* UI_Animation;
+
 	/** Get Weapon Name */
 	FString GetItemName();
 

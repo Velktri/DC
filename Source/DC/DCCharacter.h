@@ -130,6 +130,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
 	UAnimMontage* HorzontalSlash;
 
+	/** Animation to play in the Start Menu. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
+	UAnimSequence* UI_Animation;
+
 	/* Pointer to the equipped item slot */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Inventory)
 	int32 EquippedItemSlot;

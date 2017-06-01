@@ -74,10 +74,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Particles")
 	UParticleSystemComponent* OurParticleSystem;
 
-	/** Animation played on pawn */
-	UPROPERTY(EditDefaultsOnly, Category = Animation)
-	UAnimMontage* MeshAnim;
-
 	UBoxComponent* GetCollisionComp();
 
 	UFUNCTION()
