@@ -46,10 +46,6 @@ void ADCPlayerController::PrintInventory() {
 void ADCPlayerController::PauseGame() {
 	StartMenuWidget->AddToViewport();
 	InGameUI->RemoveFromViewport();
-	//bEnableClickEvents = true;
-	//bShowMouseCursor = true;
-	//FInputModeUIOnly inputType;
-	//SetInputMode(inputType);
 	bIsPaused = SetPause(true);
 }
 
@@ -57,8 +53,6 @@ void ADCPlayerController::ResumeGame() {
 	bIsPaused = SetPause(false);
 	FInputModeGameOnly inputType;
 	SetInputMode(inputType);
-	//bEnableClickEvents = false;
-	//bShowMouseCursor = false;
 	StartMenuWidget->RemoveFromViewport();
 	InGameUI->AddToViewport();
 }
