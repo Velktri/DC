@@ -25,13 +25,13 @@ public:
 
 	/** Animation to play in the Start Menu. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
-	UAnimSequence* UI_Animation;
+	UAnimationAsset* UI_Animation;
 
 	/** Get Weapon Name */
 	FString GetItemName();
 
 	/** Sets the item's owner */
-	void SetOwner(class ADCPlayerController* NewOwner);
+	void SetPlayerController(class ADCPlayerController* NewOwner);
 
 protected:
 	// Called when the game starts or when spawned

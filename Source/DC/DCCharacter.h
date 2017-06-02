@@ -88,6 +88,8 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Collision)
 	UBoxComponent* CollisionComp;
 
+	UFUNCTION()
+	UAnimationAsset* GetUIAnimation();
 
 protected:
 
@@ -132,7 +134,7 @@ protected:
 
 	/** Animation to play in the Start Menu. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
-	UAnimSequence* UI_Animation;
+	UAnimationAsset* UI_Animation;
 
 	/* Pointer to the equipped item slot */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Inventory)

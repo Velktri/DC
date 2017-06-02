@@ -22,7 +22,7 @@ void ADCItem::BeginPlay()
 	Super::BeginPlay();
 }
 
-void ADCItem::SetOwner(ADCPlayerController* NewOwner) {
+void ADCItem::SetPlayerController(ADCPlayerController* NewOwner) {
 	if (MyOwner != NewOwner) {
 		//Instigator = NewOwner;
 		MyOwner = NewOwner;

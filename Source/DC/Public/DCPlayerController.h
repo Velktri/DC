@@ -73,7 +73,7 @@ public:
 	bool bIsPaused;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = UI)
-	class AActor* WeaponRenderRef;
+	class AUI_Render* WeaponRenderRef;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Classes)
 	TSubclassOf<class AActor> WeaponRenderClass;

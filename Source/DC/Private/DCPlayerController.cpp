@@ -5,6 +5,7 @@
 #include "DCItem.h"
 #include "DCWeapon.h"
 #include "DCGameUIWidget.h"
+#include "UI_Render.h"
 
 
 ADCPlayerController::ADCPlayerController() {
@@ -12,7 +13,7 @@ ADCPlayerController::ADCPlayerController() {
 	MaxInventorySize = 30;
 	Inventory.SetNum(MaxInventorySize, false);
 
-	static ConstructorHelpers::FObjectFinder<UBlueprint> WeaponRenderBPClass(TEXT("Blueprint'/Game/Blueprints/WeaponRender_BP.WeaponRender_BP'"));
+	static ConstructorHelpers::FObjectFinder<UBlueprint> WeaponRenderBPClass(TEXT("Blueprint'/Game/Blueprints/UI_Render_BP.UI_Render_BP'"));
 	if (WeaponRenderBPClass.Object) {
 		WeaponRenderClass = (UClass*)WeaponRenderBPClass.Object->GeneratedClass;
 	}
@@ -26,10 +27,10 @@ void ADCPlayerController::BeginPlay() {
 	Super::BeginPlay();
 
 	FVector SpawnLoc = FVector(0.0f, 2000000.0f, 0.0f);
-	FRotator Rot = FRotator(0.0f, 0.0f, 0.0f);
+	FRotator Rot = FRotator(0.0f, 0.0f, 180.0f);
 	if (WeaponRenderClass) {
 		FActorSpawnParameters SpawnParams;
-		WeaponRenderRef = GetWorld()->SpawnActor<AActor>(WeaponRenderClass, SpawnLoc, Rot, SpawnParams);
+		WeaponRenderRef = GetWorld()->SpawnActor<AUI_Render>(WeaponRenderClass, SpawnLoc, Rot, SpawnParams);
 	}
 }
 
@@ -94,12 +95,12 @@ class UDCGameUIWidget* ADCPlayerController::GetStartMenuWidget() {
 void ADCPlayerController::EquipWeapon(ADCItem* InItem) {
 	if (CurrentWeapon == NULL) {
 		CurrentWeapon = Cast<ADCWeapon>(InItem);
-		CurrentWeapon->SetOwner(this);
+		CurrentWeapon->SetPlayerController(this);
 		CurrentWeapon->OnEquip();
 	} else {
 		CurrentWeapon->OnUnEquip();
 		CurrentWeapon = Cast<ADCWeapon>(InItem);
-		CurrentWeapon->SetOwner(this);
+		CurrentWeapon->SetPlayerController(this);
 		CurrentWeapon->OnEquip();
 	}
 }
