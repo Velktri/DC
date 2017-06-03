@@ -17,6 +17,7 @@ AUI_Render::AUI_Render()
 
 	CaptureComponent = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("Capture Component"));
 	CaptureComponent->SetupAttachment(DefaultSceneRoot);
+	CaptureComponent->FOVAngle = 60.0f;
 
 	PointLight = CreateDefaultSubobject<UPointLightComponent>(TEXT("Point Light"));
 	PointLight->SetupAttachment(DefaultSceneRoot);
@@ -38,10 +39,14 @@ void AUI_Render::BeginPlay()
 
 void AUI_Render::SetNewRenderMesh(AActor* InActor, ECaptureStates InputState) {
 	GetRenderElements(InActor);
+	SetRenderElements(InputState);
 	MoveCaptureCamera(InputState);
-	if (SetRenderElements(InputState))
+
+	if (InputState != ECaptureStates::Equipment)
 	{
-		UpdatePivotAndScale();
+		RenderMesh->SetRelativeLocation(FVector(0, 0, 0));
+		RenderMesh->SetRelativeRotation(FRotator(0, 0, 0));
+		RenderMesh->SetWorldScale3D(FVector(1, 1, 1));
 	}
 }
 
@@ -64,7 +69,7 @@ void AUI_Render::GetRenderElements(AActor* InActor) {
 	}
 }
 
-bool AUI_Render::SetRenderElements(ECaptureStates InputState) {
+void AUI_Render::SetRenderElements(ECaptureStates InputState) {
 	if (RenderMesh)
 	{
 		if (InMesh) 
@@ -76,47 +81,28 @@ bool AUI_Render::SetRenderElements(ECaptureStates InputState) {
 			RenderMesh->SetSkeletalMesh(NULL, true);
 			InMesh = NULL;
 			InAnimation = NULL;
-			return false;
 		}
 
 		if (InAnimation)
 		{
 			RenderMesh->PlayAnimation(InAnimation, true);
 		}
-
-		RenderMesh->SetRelativeLocation(FVector(0, 0, 0));
-		MeshRoot->SetRelativeRotation(FRotator(0, 0, 0));
-		RenderMesh->SetWorldScale3D(FVector(1, 1, 1));
-		return (InputState == ECaptureStates::Equipment) ? true : false;
 	}
 
 	InMesh = NULL;
 	InAnimation = NULL;
-	return false;
-}
-
-void AUI_Render::UpdatePivotAndScale() {
-	FTransform transform;
-	CurrentMeshSize = RenderMesh->CalcBounds(transform).BoxExtent;
-
-	FVector WorldScale = RenderMesh->GetComponentScale();
-	FVector NewScale = WorldScale * (FMath::Min3<float>(DesiredSize.X / CurrentMeshSize.X, 
-														DesiredSize.Y / CurrentMeshSize.Y, 
-														DesiredSize.Z / CurrentMeshSize.Z));
-	RenderMesh->SetWorldScale3D(NewScale);
-
-	FTransform transform2;
-	float DeltaLoc = RenderMesh->CalcBounds(transform2).BoxExtent.Z * NewScale.Z;
-	RenderMesh->SetRelativeLocation(FVector(0, 0, -DeltaLoc));
 }
 
 void AUI_Render::MoveCaptureCamera(ECaptureStates InputState) {
+	FTransform trans;
+
 	switch (InputState) {
 	case ECaptureStates::InGame:
 		CaptureComponent->SetRelativeLocation(InGameCamLoc);
 		CaptureComponent->SetRelativeRotation(InGameCamRot);
 		break;
 	case ECaptureStates::Equipment:
+		ItemCamLoc.Y = 1.73205 * RenderMesh->CalcBounds(trans).BoxExtent.Z;
 		CaptureComponent->SetRelativeLocation(ItemCamLoc);
 		CaptureComponent->SetRelativeRotation(ItemCamRot);
 		break;

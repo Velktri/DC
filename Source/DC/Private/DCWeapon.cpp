@@ -14,16 +14,16 @@ ADCWeapon::ADCWeapon() {
 	SwordMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon Mesh"));
 	SwordMesh->MeshComponentUpdateFlag = EMeshComponentUpdateFlag::OnlyTickPoseWhenRendered;
 	SwordMesh->CastShadow = true;
-	SwordMesh->AttachTo(RootComponent);
+	SwordMesh->SetupAttachment(RootComponent);
 
 	/* Add Collision to object. */
 	CollisionComp = CreateDefaultSubobject<UBoxComponent>(TEXT("CollisionComp"));
-	CollisionComp->AttachTo(SwordMesh);
+	CollisionComp->SetupAttachment(SwordMesh);
 	CollisionComp->OnComponentBeginOverlap.AddDynamic(this, &ADCWeapon::OnCollision);
 
 	/* Add Particle slot to weapon object. */
 	OurParticleSystem = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Particle Effects"));
-	OurParticleSystem->AttachTo(SwordMesh);
+	OurParticleSystem->SetupAttachment(SwordMesh);
 }
 
 UBoxComponent* ADCWeapon::GetCollisionComp() {
@@ -55,7 +55,7 @@ void ADCWeapon::AttachToPlayer() {
 	if (MyOwner) {
 		DetachFromPlayer();
 
-		USkeletalMeshComponent* Character = Cast<ADCCharacter>(MyOwner->GetControlledPawn())->GetMesh();
+		USkeletalMeshComponent* Character = Cast<ADCCharacter>(MyOwner->GetPawn())->GetMesh();
 		SwordMesh->SetHiddenInGame(false);
 		OurParticleSystem->SetHiddenInGame(false);
 		SwordMesh->AttachTo(Character, "weapon_r", EAttachLocation::SnapToTarget, true);

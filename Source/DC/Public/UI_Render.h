@@ -31,12 +31,7 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config")
-	FVector DesiredSize;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config")
-	FVector CurrentMeshSize;
-	
 	/** Called by outside functions to update Render Target */
 	UFUNCTION(BlueprintCallable)
 	void SetNewRenderMesh(class AActor* InActor, ECaptureStates InputState);
@@ -71,16 +66,14 @@ private:
 	FVector CharCamLoc = FVector(43.14, 245.15, 150.29);
 	FRotator CharCamRot = FRotator(-9.84, -99.84, -1.75); //   Y, Z, X
 
-	FVector ItemCamLoc = FVector(-40, 0, 0);
-	FRotator ItemCamRot = FRotator(0, 0, 0); //    Y, Z, X
+	FVector ItemCamLoc = FVector(7.50, 224.87, 48.94);
+	FRotator ItemCamRot = FRotator(0, 270, 0); //    Y, Z, X
 
 	/** Extract the render elements from the actor */
 	void GetRenderElements(class AActor* InActor);
 
 	/** Apply extracted elements to the render target */
-	bool SetRenderElements(ECaptureStates InputState);
-
-	void UpdatePivotAndScale();
+	void SetRenderElements(ECaptureStates InputState);
 
 	void MoveCaptureCamera(ECaptureStates InputState);
 };
