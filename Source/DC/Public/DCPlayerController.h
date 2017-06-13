@@ -5,6 +5,55 @@
 #include "GameFramework/PlayerController.h"
 #include "DCPlayerController.generated.h"
 
+class ADCEquippable;
+class UDCGameUIWidget;
+class ADCMeleeWeapon;
+class ADCArmor;
+
+USTRUCT()
+struct FEquipmentSet {
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Equipment | Weapon")
+	ADCMeleeWeapon* RightWeapon;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Equipment | Weapon")
+	ADCMeleeWeapon* LeftWeapon;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Equipment | Weapon")
+	class ADCShield* Shield;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Equipment | Weapon")
+	class ADCRangedWeapon* RangedWeapon;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Equipment | Armor")
+	ADCArmor* Head;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Equipment | Armor")
+	ADCArmor* Shoulder;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Equipment | Armor")
+	ADCArmor* Chest;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Equipment | Armor")
+	ADCArmor* Legs;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Equipment | Armor")
+	ADCArmor* Boots;
+
+	FEquipmentSet() {
+		RightWeapon		= NULL;
+		LeftWeapon		= NULL;
+		Shield			= NULL;
+		RangedWeapon	= NULL;
+		Head			= NULL;
+		Shoulder		= NULL;
+		Chest			= NULL;
+		Legs			= NULL;
+		Boots			= NULL;
+	}
+};
+
 /**
  * 
  */
@@ -32,10 +81,11 @@ public:
 	UFUNCTION()
 	void PrintInventory();
 
-	/* Show or Hide StartMenu */
+	/* Show StartMenu */
 	UFUNCTION()
 	void PauseGame();
 
+	/* Hide StartMenu */
 	UFUNCTION(BlueprintCallable, Category = "Item")
 	void ResumeGame();
 
@@ -49,13 +99,13 @@ public:
 	void AddToInventory(class ADCItem* InItem);
 
 	UFUNCTION()
-	class UDCGameUIWidget* GetInGameWidget();
+	UDCGameUIWidget* GetInGameWidget();
 
 	UFUNCTION()
-	class UDCGameUIWidget* GetStartMenuWidget();
+	UDCGameUIWidget* GetStartMenuWidget();
 
 	UFUNCTION()
-	void EquipWeapon(ADCItem* InItem);
+	void EquipEquippable(ADCItem* InItem);
 
 	/** Widget for InGame HUD */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = UI)
@@ -65,16 +115,16 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = UI)
 	class UDCGameUIWidget* StartMenuWidget;
 
-	/** Current Weapon the character is holding. */
+	/** Current Equipment the character is holding. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Inventory)
-	class ADCWeapon* CurrentWeapon;
+	FEquipmentSet CurrentEquipment;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = UI)
 	bool bIsPaused;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = UI)
-	class AUI_Render* WeaponRenderRef;
+	class AUI_Render* EquippableRenderRef;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Classes)
-	TSubclassOf<class AActor> WeaponRenderClass;
+	TSubclassOf<class AActor> EquippableRenderClass;
 };

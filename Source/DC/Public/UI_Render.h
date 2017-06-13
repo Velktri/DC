@@ -17,6 +17,17 @@ enum class ECaptureStates : uint8 {
 	None			UMETA(DisplayName = "None"),
 };
 
+USTRUCT()
+struct FCameraVectors {
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Position")
+	FVector Position;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rotation")
+	FRotator Rotation;
+};
+
 UCLASS()
 class DC_API AUI_Render : public AActor
 {
@@ -60,14 +71,9 @@ private:
 	USkeletalMesh* InMesh;
 	UAnimationAsset* InAnimation;
 
-	FVector InGameCamLoc = FVector(20.65, 56.08, 153.79);
-	FRotator InGameCamRot = FRotator(7.64, -112, -1.21); //    Y, Z, X
-
-	FVector CharCamLoc = FVector(43.14, 245.15, 150.29);
-	FRotator CharCamRot = FRotator(-9.84, -99.84, -1.75); //   Y, Z, X
-
-	FVector ItemCamLoc = FVector(7.50, 224.87, 48.94);
-	FRotator ItemCamRot = FRotator(0, 270, 0); //    Y, Z, X
+	FCameraVectors Ingame;
+	FCameraVectors Character;
+	FCameraVectors Item;
 
 	/** Extract the render elements from the actor */
 	void GetRenderElements(class AActor* InActor);

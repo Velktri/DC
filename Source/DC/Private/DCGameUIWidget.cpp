@@ -12,7 +12,5 @@ void UDCGameUIWidget::AddInventoryItem(class ADCItem* Item) {
 
 void UDCGameUIWidget::SelectItem(ADCItem* Selection) {
 	AController* PC = GetOwningPlayer();
-	if (PC) {
-		Cast<ADCPlayerController>(PC)->EquipWeapon(Selection);
-	}
+	if (PC) { Cast<ADCPlayerController>(PC)->EquipEquippable(Selection); }
 }

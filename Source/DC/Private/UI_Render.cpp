@@ -3,11 +3,9 @@
 #include "DC.h"
 #include "UI_Render.h"
 #include "DCCharacter.h"
-#include "DCWeapon.h"
+#include "DCEquippable.h"
 #include "Components/SceneCaptureComponent2D.h"
 
-
-// Sets default values
 AUI_Render::AUI_Render()
 {
 	PrimaryActorTick.bCanEverTick = false;
@@ -27,9 +25,17 @@ AUI_Render::AUI_Render()
 
 	RenderMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Render Mesh"));
 	RenderMesh->SetupAttachment(MeshRoot);
+
+	Ingame.Position = FVector(20.65, 56.08, 153.79);
+	Ingame.Rotation = FRotator(7.64, -112, -1.21);
+
+	Character.Position = FVector(43.14, 245.15, 150.29);
+	Character.Rotation = FRotator(-9.84, -99.84, -1.75);
+
+	Item.Position = FVector(7.50, 224.87, 48.94);
+	Item.Rotation = FRotator(0, 270, 0);
 }
 
-// Called when the game starts or when spawned
 void AUI_Render::BeginPlay()
 {
 	Super::BeginPlay();
@@ -58,9 +64,9 @@ void AUI_Render::GetRenderElements(AActor* InActor) {
 			InMesh = Char->GetMesh()->SkeletalMesh;
 			InAnimation = Char->GetUIAnimation();
 		} else if (InActor->IsA(ADCItem::StaticClass())) {
-			ADCWeapon* Weapon = Cast<ADCWeapon>(InActor);
-			InMesh = Weapon->SwordMesh->SkeletalMesh;
-			InAnimation = Weapon->UI_Animation;
+			ADCEquippable* Equippable = Cast<ADCEquippable>(InActor);
+			InMesh = Equippable->EquippableMesh->SkeletalMesh;
+			InAnimation = Equippable->UI_Animation;
 		}
 	} else {
 		RenderMesh->SetSkeletalMesh(NULL, true);
@@ -83,10 +89,7 @@ void AUI_Render::SetRenderElements(ECaptureStates InputState) {
 			InAnimation = NULL;
 		}
 
-		if (InAnimation)
-		{
-			RenderMesh->PlayAnimation(InAnimation, true);
-		}
+		if (InAnimation) { RenderMesh->PlayAnimation(InAnimation, true); }
 	}
 
 	InMesh = NULL;
@@ -98,17 +101,17 @@ void AUI_Render::MoveCaptureCamera(ECaptureStates InputState) {
 
 	switch (InputState) {
 	case ECaptureStates::InGame:
-		CaptureComponent->SetRelativeLocation(InGameCamLoc);
-		CaptureComponent->SetRelativeRotation(InGameCamRot);
+		CaptureComponent->SetRelativeLocation(Ingame.Position);
+		CaptureComponent->SetRelativeRotation(Ingame.Rotation);
 		break;
 	case ECaptureStates::Equipment:
-		ItemCamLoc.Y = 1.73205 * RenderMesh->CalcBounds(trans).BoxExtent.Z;
-		CaptureComponent->SetRelativeLocation(ItemCamLoc);
-		CaptureComponent->SetRelativeRotation(ItemCamRot);
+		Item.Position.Y = 1.73205 * RenderMesh->CalcBounds(trans).BoxExtent.Z;
+		CaptureComponent->SetRelativeLocation(Item.Position);
+		CaptureComponent->SetRelativeRotation(Item.Rotation);
 		break;
 	case ECaptureStates::Character:
-		CaptureComponent->SetRelativeLocation(CharCamLoc);
-		CaptureComponent->SetRelativeRotation(CharCamRot);
+		CaptureComponent->SetRelativeLocation(Character.Position);
+		CaptureComponent->SetRelativeRotation(Character.Rotation);
 		break;
 	default:
 		CaptureComponent->SetRelativeLocationAndRotation(FVector(0, 0, 0), FRotator(0, 0, 0));

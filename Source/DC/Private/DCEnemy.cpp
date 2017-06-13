@@ -2,7 +2,7 @@
 
 #include "DC.h"
 #include "DCEnemy.h"
-#include "DCWeapon.h"
+#include "DCEquippable.h"
 #include "DCLoot.h"
 #include "DCEnemyAIController.h"
 

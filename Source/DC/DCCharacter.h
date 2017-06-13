@@ -42,10 +42,6 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	float BaseLookUpRate;
 
-	///** Current Weapon the character is holding. */
-	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Inventory)
-	//class ADCWeapon* CurrentWeapon;
-
 	/** Max health of the Pawn. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
 	int32 Health;

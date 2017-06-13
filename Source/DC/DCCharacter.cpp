@@ -3,16 +3,12 @@
 #include "DC.h"
 #include "Kismet/HeadMountedDisplayFunctionLibrary.h"
 #include "DCCharacter.h"
-#include "DCItem.h"
-#include "DCWeapon.h"
+#include "DCMeleeWeapon.h"
 #include "DCLoot.h"
 #include "DCEnemy.h"
 #include "EngineUtils.h"
 #include "DCPlayerController.h"
 #include "DCGameUIWidget.h"
-
-//////////////////////////////////////////////////////////////////////////
-// ADCCharacter
 
 ADCCharacter::ADCCharacter() {
 
@@ -107,13 +103,13 @@ void ADCCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputC
 	// VR headset functionality
 	PlayerInputComponent->BindAction("ResetVR", IE_Pressed, this, &ADCCharacter::OnResetVR);
 
-	/** Weapon swapping */
-	//InputComponent->BindAction("NextWeapon", IE_Pressed, this, &ADCCharacter::EquipNextWeapon);
+	/** Equippable swapping */
+	//InputComponent->BindAction("NextEquippable", IE_Pressed, this, &ADCCharacter::EquipNextEquippable);
 
 	/** Lock on to targets */
 	InputComponent->BindAction("LockOn", IE_Pressed, this, &ADCCharacter::LockOn);
 
-	/** Weapon Attacks */
+	/** Equippable Attacks */
 	InputComponent->BindAction("Attack", IE_Pressed, this, &ADCCharacter::Attack);
 }
 
@@ -176,15 +172,15 @@ void ADCCharacter::MoveRight(float Value)
 
 
 void ADCCharacter::ProcessLoot(AActor* OtherActor) {
-	ADCLoot* WeaponLoot = Cast<ADCLoot>(OtherActor);
-	if (WeaponLoot) {
-		TArray<TSubclassOf<ADCItem>> lootItems = WeaponLoot->GetLootContents();
+	ADCLoot* EquippableLoot = Cast<ADCLoot>(OtherActor);
+	if (EquippableLoot) {
+		TArray<TSubclassOf<ADCItem>> lootItems = EquippableLoot->GetLootContents();
 		for (TSubclassOf<ADCItem> loot : lootItems) {
 			ADCItem* Spawner = GetWorld()->SpawnActor<ADCItem>(loot);
 
-			if (Spawner && Spawner->IsA(ADCWeapon::StaticClass())) {
-				Cast<ADCWeapon>(Spawner)->SwordMesh->SetHiddenInGame(true);
-				Cast<ADCWeapon>(Spawner)->OurParticleSystem->SetHiddenInGame(true);
+			if (Spawner && Spawner->IsA(ADCEquippable::StaticClass())) {
+				Cast<ADCEquippable>(Spawner)->EquippableMesh->SetHiddenInGame(true);
+				Cast<ADCEquippable>(Spawner)->OurParticleSystem->SetHiddenInGame(true);
 
 				AController* PC = GetController();
 				if (PC)
@@ -198,13 +194,13 @@ void ADCCharacter::ProcessLoot(AActor* OtherActor) {
 
 void ADCCharacter::Attack() {
 	if (GetController() && GetController()->IsA(ADCPlayerController::StaticClass())) {
-		ADCWeapon* Weapon = Cast<ADCPlayerController>(GetController())->CurrentWeapon;
-		if (Weapon != NULL && ActionState == ECharState::I) {
+		ADCMeleeWeapon* CurrentWeapon = Cast<ADCPlayerController>(GetController())->CurrentEquipment.RightWeapon;
+		if (CurrentWeapon != NULL && ActionState == ECharState::I) {
 			ActionState = ECharState::A;
 
-			UBoxComponent* WeaponCollision = Weapon->GetCollisionComp();
-			if (WeaponCollision) {
-				Weapon->GetCollisionComp()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+			UBoxComponent* EquippableCollision = CurrentWeapon->GetCollisionComp();
+			if (EquippableCollision) {
+				CurrentWeapon->GetCollisionComp()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 			}
 			EndAttack();
 			//float AttackDuration = 0.0f;
@@ -223,7 +219,7 @@ void ADCCharacter::Attack() {
 void ADCCharacter::EndAttack() {
 	if (GetController() && GetController()->IsA(ADCPlayerController::StaticClass())) {
 		ActionState = ECharState::I;
-		Cast<ADCPlayerController>(GetController())->CurrentWeapon->GetCollisionComp()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		Cast<ADCPlayerController>(GetController())->CurrentEquipment.RightWeapon->GetCollisionComp()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 }
 

@@ -2,10 +2,9 @@
 
 #include "DC.h"
 #include "DCPlayerController.h"
-#include "DCItem.h"
-#include "DCWeapon.h"
 #include "DCGameUIWidget.h"
 #include "UI_Render.h"
+#include "DCMeleeWeapon.h"
 
 
 ADCPlayerController::ADCPlayerController() {
@@ -13,13 +12,11 @@ ADCPlayerController::ADCPlayerController() {
 	MaxInventorySize = 30;
 	Inventory.SetNum(MaxInventorySize, false);
 
-	static ConstructorHelpers::FObjectFinder<UBlueprint> WeaponRenderBPClass(TEXT("Blueprint'/Game/Blueprints/UI_Render_BP.UI_Render_BP'"));
-	if (WeaponRenderBPClass.Object) {
-		WeaponRenderClass = (UClass*)WeaponRenderBPClass.Object->GeneratedClass;
+	static ConstructorHelpers::FObjectFinder<UBlueprint> EquippableRenderBPClass(TEXT("Blueprint'/Game/Blueprints/UI_Render_BP.UI_Render_BP'"));
+	if (EquippableRenderBPClass.Object) {
+		EquippableRenderClass = (UClass*)EquippableRenderBPClass.Object->GeneratedClass;
 	}
 
-	/* Character is spawned without any weapon equipped */
-	CurrentWeapon = NULL;
 	bIsPaused = false;
 }
 
@@ -28,17 +25,17 @@ void ADCPlayerController::BeginPlay() {
 
 	FVector SpawnLoc = FVector(0.0f, 2000000.0f, 0.0f);
 	FRotator Rot = FRotator(0.0f, 180.0f, 0.0f);
-	if (WeaponRenderClass) {
+	if (EquippableRenderClass) {
 		FActorSpawnParameters SpawnParams;
-		WeaponRenderRef = GetWorld()->SpawnActor<AUI_Render>(WeaponRenderClass, SpawnLoc, Rot, SpawnParams);
+		EquippableRenderRef = GetWorld()->SpawnActor<AUI_Render>(EquippableRenderClass, SpawnLoc, Rot, SpawnParams);
 	}
 }
 
 void ADCPlayerController::PrintInventory() {
 	for (int32 i = Inventory.Num() - 1; i >= 0; i--) {
-		ADCItem* Weapon = Inventory[i];
-		if (Weapon) {
-			FString string = "Slot " + FString::FromInt(i) + ": " + Weapon->GetItemName() + ".";
+		ADCItem* Equippable = Inventory[i];
+		if (Equippable) {
+			FString string = "Slot " + FString::FromInt(i) + ": " + Equippable->GetItemName() + ".";
 			UE_LOG(LogTemp, Warning, TEXT("%s"), *string);
 		}
 	}
@@ -92,14 +89,15 @@ class UDCGameUIWidget* ADCPlayerController::GetStartMenuWidget() {
 	return StartMenuWidget;
 }
 
-void ADCPlayerController::EquipWeapon(ADCItem* InItem) {
+void ADCPlayerController::EquipEquippable(ADCItem* InItem) {
+	ADCMeleeWeapon* CurrentWeapon = CurrentEquipment.RightWeapon;
 	if (CurrentWeapon == NULL) {
-		CurrentWeapon = Cast<ADCWeapon>(InItem);
+		CurrentWeapon = Cast<ADCMeleeWeapon>(InItem);
 		CurrentWeapon->SetPlayerController(this);
 		CurrentWeapon->OnEquip();
 	} else {
 		CurrentWeapon->OnUnEquip();
-		CurrentWeapon = Cast<ADCWeapon>(InItem);
+		CurrentWeapon = Cast<ADCMeleeWeapon>(InItem);
 		CurrentWeapon->SetPlayerController(this);
 		CurrentWeapon->OnEquip();
 	}

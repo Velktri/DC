@@ -13,7 +13,6 @@ class DC_API ADCItem : public AActor
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
 	ADCItem();
 
 	/** Returns the name of the item */
