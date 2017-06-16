@@ -77,10 +77,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Inventory)
 	int32 MaxInventorySize;
 
-	/** Print the current inventory */
-	UFUNCTION()
-	void PrintInventory();
-
 	/* Show StartMenu */
 	UFUNCTION()
 	void PauseGame();
@@ -99,6 +95,9 @@ public:
 	void AddToInventory(class ADCItem* InItem);
 
 	UFUNCTION()
+	void CreatePlayerWidgets();
+
+	UFUNCTION()
 	UDCGameUIWidget* GetInGameWidget();
 
 	UFUNCTION()
@@ -109,11 +108,16 @@ public:
 
 	/** Widget for InGame HUD */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = UI)
+	TSubclassOf<class UUserWidget> InGameClass;
+
 	class UDCGameUIWidget* InGameUI;
 
 	/** Widget for Start Menu */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = UI)
+	TSubclassOf<class UUserWidget> StartMenuClass;
+
 	class UDCGameUIWidget* StartMenuWidget;
+
 
 	/** Current Equipment the character is holding. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Inventory)

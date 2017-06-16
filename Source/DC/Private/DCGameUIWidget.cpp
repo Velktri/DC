@@ -5,12 +5,14 @@
 #include "DCItem.h"
 #include "DCPlayerController.h"
 
-
 void UDCGameUIWidget::AddInventoryItem(class ADCItem* Item) {
 	UpdateInventory(Item);
 }
 
 void UDCGameUIWidget::SelectItem(ADCItem* Selection) {
-	AController* PC = GetOwningPlayer();
-	if (PC) { Cast<ADCPlayerController>(PC)->EquipEquippable(Selection); }
+	if (OwningPC) { OwningPC->EquipEquippable(Selection); }
+}
+
+void UDCGameUIWidget::SetDCPlayerController() {
+	if (!OwningPC) { OwningPC = Cast<ADCPlayerController>(GetOwningPlayer()); }
 }

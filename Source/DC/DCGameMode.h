@@ -10,6 +10,8 @@ class ADCGameMode : public AGameModeBase
 
 public:
 	ADCGameMode();
+
+	virtual void BeginPlay() override;
 };
 
 

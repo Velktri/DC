@@ -11,12 +11,6 @@ ADCPlayerController::ADCPlayerController() {
 	/* Generate an empty Inventory */
 	MaxInventorySize = 30;
 	Inventory.SetNum(MaxInventorySize, false);
-
-	static ConstructorHelpers::FObjectFinder<UBlueprint> EquippableRenderBPClass(TEXT("Blueprint'/Game/Blueprints/UI_Render_BP.UI_Render_BP'"));
-	if (EquippableRenderBPClass.Object) {
-		EquippableRenderClass = (UClass*)EquippableRenderBPClass.Object->GeneratedClass;
-	}
-
 	bIsPaused = false;
 }
 
@@ -28,16 +22,6 @@ void ADCPlayerController::BeginPlay() {
 	if (EquippableRenderClass) {
 		FActorSpawnParameters SpawnParams;
 		EquippableRenderRef = GetWorld()->SpawnActor<AUI_Render>(EquippableRenderClass, SpawnLoc, Rot, SpawnParams);
-	}
-}
-
-void ADCPlayerController::PrintInventory() {
-	for (int32 i = Inventory.Num() - 1; i >= 0; i--) {
-		ADCItem* Equippable = Inventory[i];
-		if (Equippable) {
-			FString string = "Slot " + FString::FromInt(i) + ": " + Equippable->GetItemName() + ".";
-			UE_LOG(LogTemp, Warning, TEXT("%s"), *string);
-		}
 	}
 }
 
@@ -59,7 +43,6 @@ void ADCPlayerController::SetupInputComponent() {
 	Super::SetupInputComponent();
 
 	/** Testing Inputs */
-	InputComponent->BindAction("PrintInventory", IE_Pressed, this, &ADCPlayerController::PrintInventory);
 	InputComponent->BindAction("StartMenu", IE_Pressed, this, &ADCPlayerController::PauseGame);
 }
 
@@ -79,6 +62,25 @@ void ADCPlayerController::AddToInventory(ADCItem* InItem) {
 	}
 
 	if (size == MaxInventorySize) {  UE_LOG(LogTemp, Warning, TEXT("Inventory is Full."));  }
+}
+
+void ADCPlayerController::CreatePlayerWidgets() {
+	if (InGameClass)
+	{
+		InGameUI = CreateWidget<UDCGameUIWidget>(this, InGameClass);
+		InGameUI->AddToViewport();
+		InGameUI->OwningPC = this;
+	}
+
+	if (StartMenuClass)
+	{
+		StartMenuWidget = CreateWidget<UDCGameUIWidget>(this, StartMenuClass);
+		StartMenuWidget->OwningPC = this;
+		FInputModeGameOnly inputType;
+		SetInputMode(inputType);
+	}
+
+	EquippableRenderRef->SetNewRenderMesh(GetControlledPawn(), ECaptureStates::InGame);
 }
 
 UDCGameUIWidget* ADCPlayerController::GetInGameWidget() {
@@ -101,4 +103,5 @@ void ADCPlayerController::EquipEquippable(ADCItem* InItem) {
 		CurrentWeapon->SetPlayerController(this);
 		CurrentWeapon->OnEquip();
 	}
+	CurrentEquipment.RightWeapon = CurrentWeapon;
 }

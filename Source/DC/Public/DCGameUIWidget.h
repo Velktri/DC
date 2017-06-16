@@ -14,7 +14,6 @@ class DC_API UDCGameUIWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
-
 	UFUNCTION()
 	void AddInventoryItem(class ADCItem* Item);
 
@@ -26,6 +25,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = UI)
 	class ADCPlayerController* OwningPC;
+
+	UFUNCTION(BlueprintCallable)
+	void SetDCPlayerController();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = UI)
 	class UDCGameUIWidget* PrimaryFocusWidget;
