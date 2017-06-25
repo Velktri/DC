@@ -4,6 +4,9 @@
 #include "DCPlayerController.h"
 #include "DCGameUIWidget.h"
 #include "UI_Render.h"
+#include "DCArmor.h"
+#include "DCShield.h"
+#include "DCRangedWeapon.h"
 #include "DCMeleeWeapon.h"
 
 
@@ -12,6 +15,16 @@ ADCPlayerController::ADCPlayerController() {
 	MaxInventorySize = 30;
 	Inventory.SetNum(MaxInventorySize, false);
 	bIsPaused = false;
+
+	CurrentEquipment.Add(ESlotType::Head,			NULL);
+	CurrentEquipment.Add(ESlotType::Shoulder,		NULL);
+	CurrentEquipment.Add(ESlotType::Chest,			NULL);
+	CurrentEquipment.Add(ESlotType::Legs,			NULL);
+	CurrentEquipment.Add(ESlotType::Boots,			NULL);
+	CurrentEquipment.Add(ESlotType::RightWeapon,	NULL);
+	CurrentEquipment.Add(ESlotType::LeftWeapon,		NULL);
+	CurrentEquipment.Add(ESlotType::RangedWeapon,	NULL);
+
 }
 
 void ADCPlayerController::BeginPlay() {
@@ -80,7 +93,7 @@ void ADCPlayerController::CreatePlayerWidgets() {
 		SetInputMode(inputType);
 	}
 
-	EquippableRenderRef->SetNewRenderMesh(GetControlledPawn(), ECaptureStates::InGame);
+	EquippableRenderRef->SetNewRenderMesh(GetPawn(), ECaptureStates::InGame);
 }
 
 UDCGameUIWidget* ADCPlayerController::GetInGameWidget() {
@@ -91,17 +104,42 @@ class UDCGameUIWidget* ADCPlayerController::GetStartMenuWidget() {
 	return StartMenuWidget;
 }
 
-void ADCPlayerController::EquipEquippable(ADCItem* InItem) {
-	ADCMeleeWeapon* CurrentWeapon = CurrentEquipment.RightWeapon;
-	if (CurrentWeapon == NULL) {
-		CurrentWeapon = Cast<ADCMeleeWeapon>(InItem);
-		CurrentWeapon->SetPlayerController(this);
-		CurrentWeapon->OnEquip();
-	} else {
-		CurrentWeapon->OnUnEquip();
-		CurrentWeapon = Cast<ADCMeleeWeapon>(InItem);
-		CurrentWeapon->SetPlayerController(this);
-		CurrentWeapon->OnEquip();
+void ADCPlayerController::EquipEquippable(ADCEquippable* InItem) {
+	if (InItem)
+	{
+		if (InItem->IsA(ADCArmor::StaticClass()))
+		{
+			EquipToSlot<ADCArmor>(InItem);
+		} 
+		else if (InItem->IsA(ADCMeleeWeapon::StaticClass())) 
+		{
+			EquipToSlot<ADCMeleeWeapon>(InItem);
+		} 
+		else if (InItem->IsA(ADCRangedWeapon::StaticClass())) 
+		{
+			EquipToSlot<ADCRangedWeapon>(InItem);
+		}
+		else if (InItem->IsA(ADCShield::StaticClass())) {
+			EquipToSlot<ADCShield>(InItem);
+		}
 	}
-	CurrentEquipment.RightWeapon = CurrentWeapon;
+}
+
+template< class T >
+void ADCPlayerController::EquipToSlot(ADCEquippable* InItem) {
+	T* ArmorItem = Cast<T>(InItem);
+	if (ArmorItem) {
+		T* CurrentArmor = Cast<T>(CurrentEquipment[ArmorItem->SlotType]);
+		if (CurrentArmor == NULL) {
+			CurrentArmor = ArmorItem;
+			CurrentArmor->SetPlayerController(this);
+			CurrentArmor->OnEquip();
+		} else {
+			CurrentArmor->OnUnEquip();
+			CurrentArmor = ArmorItem;
+			CurrentArmor->SetPlayerController(this);
+			CurrentArmor->OnEquip();
+		}
+		CurrentEquipment[ArmorItem->SlotType] = CurrentArmor;
+	}
 }

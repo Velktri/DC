@@ -1,18 +1,11 @@
 // Copyright 1998-2017 Epic Games, Inc. All Rights Reserved.
 #pragma once
 #include "GameFramework/Character.h"
+#include "DCTypes.h"
 #include "DCCharacter.generated.h"
 
 #define LOCKON_RADIUS 1000.0f
 
-UENUM(BlueprintType)
-enum class ECharState : uint8 {
-	I		UMETA(DisplayName = "Idle"),
-	A		UMETA(DisplayName = "Attacking"),
-	B		UMETA(DisplayName = "Blocking"),
-	C		UMETA(DisplayName = "Countering"),
-	E		UMETA(DisplayName = "Equipping"),
-};
 
 UCLASS(config=Game)
 class ADCCharacter : public ACharacter {

@@ -194,7 +194,7 @@ void ADCCharacter::ProcessLoot(AActor* OtherActor) {
 
 void ADCCharacter::Attack() {
 	if (GetController() && GetController()->IsA(ADCPlayerController::StaticClass())) {
-		ADCMeleeWeapon* CurrentWeapon = Cast<ADCPlayerController>(GetController())->CurrentEquipment.RightWeapon;
+		ADCMeleeWeapon* CurrentWeapon = Cast<ADCMeleeWeapon>(Cast<ADCPlayerController>(GetController())->CurrentEquipment[ESlotType::RightWeapon]);
 		if (CurrentWeapon != NULL && ActionState == ECharState::I) {
 			ActionState = ECharState::A;
 
@@ -219,7 +219,7 @@ void ADCCharacter::Attack() {
 void ADCCharacter::EndAttack() {
 	if (GetController() && GetController()->IsA(ADCPlayerController::StaticClass())) {
 		ActionState = ECharState::I;
-		Cast<ADCPlayerController>(GetController())->CurrentEquipment.RightWeapon->GetCollisionComp()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		Cast<ADCMeleeWeapon>(Cast<ADCPlayerController>(GetController())->CurrentEquipment[ESlotType::RightWeapon])->GetCollisionComp()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 }
 
