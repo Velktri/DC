@@ -18,24 +18,15 @@ public:
 	UFUNCTION()
 	void AddInventoryItem(class ADCItem* Item);
 
-	UFUNCTION(BlueprintCallable, Category = "Item")
-	void GenerateEquipSlot(TSubclassOf<UUserWidget> ChildWidgetClass, class UPanelWidget* ParentWidget, ESlotType EquipSlot, ADCItem* Selection, UDCGameUIWidget*& ChildWidget, ADCEquippable*& EquipSelection);
-
-	UFUNCTION(BlueprintImplementableEvent, Category = "Item")
+	UFUNCTION(BlueprintImplementableEvent, Category = "Config")
 	void UpdateInventory(class ADCItem* Item);
-	
-	UFUNCTION(BlueprintCallable, Category = "Item")
-	void SelectItem(ADCItem* Selection);
 
-	UFUNCTION(BlueprintCallable, Category = "Item")
-	void SelectEquipment(class ADCEquippable* EquipmentItem);
-
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Config")
 	void SetDCPlayerController();
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = UI)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config")
 	class ADCPlayerController* OwningPC;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = UI)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config")
 	class UDCGameUIWidget* PrimaryFocusWidget;
 };

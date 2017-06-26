@@ -38,7 +38,7 @@ void ADCEquippable::AttachToPlayer() {
 		USkeletalMeshComponent* Character = Cast<ADCCharacter>(MyOwner->GetPawn())->GetMesh();
 		EquippableMesh->SetHiddenInGame(false);
 		OurParticleSystem->SetHiddenInGame(false);
-		EquippableMesh->AttachToComponent(Character, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), EquipSocket);
+		EquippableMesh->AttachToComponent(Character, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepRelative, true), EquipSocket);
 	}
 }
 
