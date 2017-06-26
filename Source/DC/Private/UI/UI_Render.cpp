@@ -56,6 +56,10 @@ void AUI_Render::SetNewRenderMesh(AActor* InActor, ECaptureStates InputState) {
 	}
 }
 
+void AUI_Render::AppendEquipmentToRender() {
+
+}
+
 void AUI_Render::GetRenderElements(AActor* InActor) {
 	if (InActor)
 	{

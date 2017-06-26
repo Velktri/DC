@@ -14,9 +14,9 @@ void UDCEquipmentSlot::ItemClick() {
 	if (OwningPC && OwningPC->EquippableRenderRef) {
 		if (EquipmentRef) {
 			SelectEquipment(EquipmentRef);
-			OwningPC->EquippableRenderRef->SetNewRenderMesh(EquipmentRef, ECaptureStates::Equipment);
+			OwningPC->EquippableRenderRef->AppendEquipmentToRender();
 		} else {
-			OwningPC->EquippableRenderRef->SetNewRenderMesh(NULL, ECaptureStates::None);
+			OwningPC->EquippableRenderRef->AppendEquipmentToRender();
 		}
 	}
 }

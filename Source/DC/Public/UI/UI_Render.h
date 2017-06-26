@@ -67,6 +67,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Components)
 	USkeletalMeshComponent* RenderMesh;
 
+	/** Add equipment to Mesh */
+	UFUNCTION(Category = Config)
+	void AppendEquipmentToRender();
+
 private:
 	USkeletalMesh* InMesh;
 	UAnimationAsset* InAnimation;

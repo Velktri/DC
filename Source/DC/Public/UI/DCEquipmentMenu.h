@@ -22,6 +22,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Config)
 	class UPanelWidget* EquipmentSlotContainer;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Config)
+	class UButton* FocusButton;
+
 	UFUNCTION(BlueprintCallable, Category = "Config")
 	UDCGameUIWidget* GenerateEquipSlot(ESlotType EquipSlot, ADCEquippable* Selection);
 
