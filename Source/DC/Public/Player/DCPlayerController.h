@@ -55,9 +55,6 @@ public:
 	void CreatePlayerWidgets();
 
 	UFUNCTION()
-	UDCGameUIWidget* GetInGameWidget();
-
-	UFUNCTION()
 	UDCGameUIWidget* GetStartMenuWidget();
 
 	UFUNCTION()
@@ -65,14 +62,6 @@ public:
 
 	template< class T >
 	void EquipToSlot(ADCEquippable* InItem);
-
-	/** Widget for InGame HUD */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = UI)
-	TSubclassOf<class UUserWidget> InGameClass;
-
-	/** Widget instance for InGame HUD */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = UI)
-	class UDCGameUIWidget* InGameUI;
 
 	/** Widget for Start Menu */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = UI)

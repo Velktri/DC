@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "DCTypes.h"
 #include "GameFramework/Actor.h"
 #include "UI_Render.generated.h"
 
@@ -69,7 +70,15 @@ public:
 
 	/** Add equipment to Mesh */
 	UFUNCTION(Category = Config)
-	void AppendEquipmentToRender();
+	void AppendEquipmentToRender(ADCEquippable* EquipmentPiece);
+
+	/** Current Equipment the character is holding. */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Inventory)
+	TMap<ESlotType, USkeletalMeshComponent*> RenderEquipment;
+
+	/** Current Equipment the character is holding. */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Inventory)
+	class ADCPlayerController* OwningPC;
 
 private:
 	USkeletalMesh* InMesh;
@@ -83,7 +92,9 @@ private:
 	void GetRenderElements(class AActor* InActor);
 
 	/** Apply extracted elements to the render target */
-	void SetRenderElements(ECaptureStates InputState);
+	void SetRenderElements();
 
 	void MoveCaptureCamera(ECaptureStates InputState);
+
+	void EquipToSlot(ADCEquippable* InItem, FName SocketName);
 };

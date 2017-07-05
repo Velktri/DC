@@ -4,5 +4,6 @@
 #define __DC_H__
 
 #include "EngineMinimal.h"
+#include "SlateBasics.h"
 
 #endif

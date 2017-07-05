@@ -48,7 +48,8 @@ void UDCStartMenu::InitCurrentRenderTarget() {
 			}
 			break;
 		case 1:
-			if (OwningPC) {
+			if (OwningPC) 
+			{
 				Cast<AUI_Render>(OwningPC->EquippableRenderRef)->SetNewRenderMesh(OwningPC->GetPawn(), ECaptureStates::Character);
 			}
 			break;
@@ -59,7 +60,9 @@ void UDCStartMenu::InitCurrentRenderTarget() {
 				if (InvSlot && OwningPC->EquippableRenderRef)
 				{
 					OwningPC->EquippableRenderRef->SetNewRenderMesh(InvSlot->ItemRef, ECaptureStates::Equipment);
-				} else {
+				} 
+				else 
+				{
 					OwningPC->EquippableRenderRef->SetNewRenderMesh(NULL, ECaptureStates::None);
 				}
 			}
@@ -117,7 +120,6 @@ void UDCStartMenu::DetermineKeyEvent(FKey InKey) {
 			Shoulder_Pressed_Event(false);
 		}
 	}
-
 }
 
 float UDCStartMenu::Shoulder_Pressed(bool LeftPressed) {
@@ -139,12 +141,12 @@ void UDCStartMenu::Shoulder(bool LeftPressed) {
 		PanelSwitcher->SetActiveWidgetIndex(ActiveMenuIndex);
 		SetWidgetFocus(PanelSwitcher->GetWidgetAtIndex(ActiveMenuIndex));
 	} 
-	else if (LeftPressed && ActiveMenuIndex > 0) {
+	else if (LeftPressed && ActiveMenuIndex > 0) 
+	{
 		ActiveMenuIndex--;
 		PanelSwitcher->SetActiveWidgetIndex(ActiveMenuIndex);
 		SetWidgetFocus(PanelSwitcher->GetWidgetAtIndex(ActiveMenuIndex));
 	}
 
 	InitCurrentRenderTarget();
-	//bIsBlockingInput = false;
 }

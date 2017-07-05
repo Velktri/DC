@@ -4,6 +4,7 @@
 #include "UI_Render.h"
 #include "DCCharacter.h"
 #include "DCEquippable.h"
+#include "DCPlayerController.h"
 #include "Components/SceneCaptureComponent2D.h"
 
 AUI_Render::AUI_Render()
@@ -34,6 +35,20 @@ AUI_Render::AUI_Render()
 
 	Item.Position = FVector(7.50, 224.87, 48.94);
 	Item.Rotation = FRotator(0, 270, 0);
+
+	/* Generate Current Equipment */
+	RenderEquipment.Add(ESlotType::Head,			CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Head")));
+	RenderEquipment.Add(ESlotType::Shoulder,		CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Shoulder")));
+	RenderEquipment.Add(ESlotType::Chest,			CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Chest")));
+	RenderEquipment.Add(ESlotType::Legs,			CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Legs")));
+	RenderEquipment.Add(ESlotType::Boots,			CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Boots")));
+	RenderEquipment.Add(ESlotType::RightWeapon,		CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("RightWeapon")));
+	RenderEquipment.Add(ESlotType::LeftWeapon,		CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("LeftWeapon")));
+	RenderEquipment.Add(ESlotType::RangedWeapon,	CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("RangedWeapon")));
+
+	for (auto& Elem : RenderEquipment) {
+		Elem.Value->SetupAttachment(MeshRoot);
+	}
 }
 
 void AUI_Render::BeginPlay()
@@ -45,7 +60,7 @@ void AUI_Render::BeginPlay()
 
 void AUI_Render::SetNewRenderMesh(AActor* InActor, ECaptureStates InputState) {
 	GetRenderElements(InActor);
-	SetRenderElements(InputState);
+	SetRenderElements();
 	MoveCaptureCamera(InputState);
 
 	if (InputState != ECaptureStates::Equipment)
@@ -56,35 +71,72 @@ void AUI_Render::SetNewRenderMesh(AActor* InActor, ECaptureStates InputState) {
 	}
 }
 
-void AUI_Render::AppendEquipmentToRender() {
-
+void AUI_Render::AppendEquipmentToRender(ADCEquippable* EquipmentPiece) {
+	if (RenderMesh)
+	{
+		switch (EquipmentPiece->SlotType) {
+		case ESlotType::Head:
+			EquipToSlot(EquipmentPiece, "Helm");
+			break;
+		case ESlotType::RightWeapon:
+			EquipToSlot(EquipmentPiece, "MainHand");
+			break;
+		case ESlotType::LeftWeapon:
+			EquipToSlot(EquipmentPiece, "OffHand");
+			break;
+		default:
+			break;
+		}
+	}
 }
 
 void AUI_Render::GetRenderElements(AActor* InActor) {
 	if (InActor)
 	{
-		if (InActor->IsA(ADCCharacter::StaticClass())) {
+		if (InActor->IsA(ADCCharacter::StaticClass())) 
+		{
+			for (auto& Elem : RenderEquipment) {
+				Elem.Value->SetHiddenInGame(false);
+			}
+
 			ADCCharacter* Char = Cast<ADCCharacter>(InActor);
 			InMesh = Char->GetMesh()->SkeletalMesh;
 			InAnimation = Char->GetUIAnimation();
-		} else if (InActor->IsA(ADCItem::StaticClass())) {
+		} 
+		else if (InActor->IsA(ADCItem::StaticClass())) 
+		{
+			for (auto& Elem : RenderEquipment) {
+				Elem.Value->SetHiddenInGame(true);
+			}
+
 			ADCEquippable* Equippable = Cast<ADCEquippable>(InActor);
 			InMesh = Equippable->EquippableMesh->SkeletalMesh;
 			InAnimation = Equippable->UI_Animation;
 		}
-	} else {
+	} 
+	else 
+	{
 		RenderMesh->SetSkeletalMesh(NULL, true);
 		InMesh = NULL;
 		InAnimation = NULL;
 	}
 }
 
-void AUI_Render::SetRenderElements(ECaptureStates InputState) {
+void AUI_Render::SetRenderElements() {
 	if (RenderMesh)
 	{
 		if (InMesh) 
 		{
 			RenderMesh->SetSkeletalMesh(InMesh, true);
+
+			//EquipToSlot(OwningPC->CurrentEquipment[ESlotType::Head],				"Helm");
+			////EquipToSlot(OwningPC->CurrentEquipment[ESlotType::Shoulder],			"Helm");	
+			////EquipToSlot(OwningPC->CurrentEquipment[ESlotType::Chest],				"Helm");	
+			////EquipToSlot(OwningPC->CurrentEquipment[ESlotType::Legs],				"Helm");	
+			////EquipToSlot(OwningPC->CurrentEquipment[ESlotType::Boots],				"Helm");
+			//EquipToSlot(OwningPC->CurrentEquipment[ESlotType::RightWeapon],			"MainHand");
+			//EquipToSlot(OwningPC->CurrentEquipment[ESlotType::LeftWeapon],			"OffHand");
+			////EquipToSlot(OwningPC->CurrentEquipment[ESlotType::RangedWeapon],		"Helm");
 		} 
 		else 
 		{
@@ -120,6 +172,14 @@ void AUI_Render::MoveCaptureCamera(ECaptureStates InputState) {
 	default:
 		CaptureComponent->SetRelativeLocationAndRotation(FVector(0, 0, 0), FRotator(0, 0, 0));
 		break;
+	}
+}
+
+void AUI_Render::EquipToSlot(ADCEquippable* InItem, FName SocketName) {
+	if (RenderMesh && InItem) {
+		RenderEquipment[InItem->SlotType]->SetSkeletalMesh(InItem->EquippableMesh->SkeletalMesh, true);
+		RenderEquipment[InItem->SlotType]->SetWorldScale3D(InItem->EquippableMesh->GetComponentScale());
+		RenderEquipment[InItem->SlotType]->AttachToComponent(RenderMesh, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepRelative, true), SocketName);
 	}
 }
 

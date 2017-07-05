@@ -6,6 +6,7 @@
 #include "UI_Render.h"
 #include "DCArmor.h"
 #include "DCShield.h"
+#include "DCHUD.h"
 #include "DCRangedWeapon.h"
 #include "DCMeleeWeapon.h"
 
@@ -35,12 +36,13 @@ void ADCPlayerController::BeginPlay() {
 	if (EquippableRenderClass) {
 		FActorSpawnParameters SpawnParams;
 		EquippableRenderRef = GetWorld()->SpawnActor<AUI_Render>(EquippableRenderClass, SpawnLoc, Rot, SpawnParams);
+		EquippableRenderRef->OwningPC = this;
 	}
 }
 
 void ADCPlayerController::PauseGame() {
 	StartMenuWidget->AddToViewport();
-	InGameUI->RemoveFromViewport();
+	Cast<ADCHUD>(GetHUD())->ToggleHUD();
 	bIsPaused = SetPause(true);
 }
 
@@ -49,7 +51,7 @@ void ADCPlayerController::ResumeGame() {
 	FInputModeGameOnly inputType;
 	SetInputMode(inputType);
 	StartMenuWidget->RemoveFromViewport();
-	InGameUI->AddToViewport();
+	Cast<ADCHUD>(GetHUD())->ToggleHUD();
 }
 
 void ADCPlayerController::SetupInputComponent() {
@@ -78,13 +80,6 @@ void ADCPlayerController::AddToInventory(ADCItem* InItem) {
 }
 
 void ADCPlayerController::CreatePlayerWidgets() {
-	if (InGameClass)
-	{
-		InGameUI = CreateWidget<UDCGameUIWidget>(this, InGameClass);
-		InGameUI->AddToViewport();
-		InGameUI->OwningPC = this;
-	}
-
 	if (StartMenuClass)
 	{
 		StartMenuWidget = CreateWidget<UDCGameUIWidget>(this, StartMenuClass);
@@ -93,11 +88,7 @@ void ADCPlayerController::CreatePlayerWidgets() {
 		SetInputMode(inputType);
 	}
 
-	EquippableRenderRef->SetNewRenderMesh(GetPawn(), ECaptureStates::InGame);
-}
-
-UDCGameUIWidget* ADCPlayerController::GetInGameWidget() {
-	return InGameUI;
+	if (EquippableRenderRef) { EquippableRenderRef->SetNewRenderMesh(GetPawn(), ECaptureStates::InGame); }
 }
 
 class UDCGameUIWidget* ADCPlayerController::GetStartMenuWidget() {
@@ -111,15 +102,16 @@ void ADCPlayerController::EquipEquippable(ADCEquippable* InItem) {
 		{
 			EquipToSlot<ADCArmor>(InItem);
 		} 
-		else if (InItem->IsA(ADCMeleeWeapon::StaticClass())) 
+		else if (InItem->IsA(ADCMeleeWeapon::StaticClass()))
 		{
 			EquipToSlot<ADCMeleeWeapon>(InItem);
 		} 
-		else if (InItem->IsA(ADCRangedWeapon::StaticClass())) 
+		else if (InItem->IsA(ADCRangedWeapon::StaticClass()))
 		{
 			EquipToSlot<ADCRangedWeapon>(InItem);
 		}
-		else if (InItem->IsA(ADCShield::StaticClass())) {
+		else if (InItem->IsA(ADCShield::StaticClass()))
+		{
 			EquipToSlot<ADCShield>(InItem);
 		}
 	}

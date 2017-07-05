@@ -7,12 +7,14 @@
 #include "Blueprint/UserWidget.h"
 #include "DCGameUIWidget.h"
 #include "UI_Render.h"
+#include "DCHUD.h"
 
 ADCGameMode::ADCGameMode()
 {
 	// set default pawn class to our Blueprinted character
 	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/ThirdPersonCPP/Blueprints/ThirdPersonCharacter"));
 	if (PlayerPawnBPClass.Class != NULL) { DefaultPawnClass = PlayerPawnBPClass.Class; }
+	HUDClass = ADCHUD::StaticClass();
 }
 
 void ADCGameMode::BeginPlay() {

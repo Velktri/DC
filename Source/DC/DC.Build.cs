@@ -6,7 +6,13 @@ public class DC : ModuleRules
 {
 	public DC(ReadOnlyTargetRules Target) : base (Target)
 	{
-		PublicDependencyModuleNames.AddRange(
+        PrivateIncludePaths.AddRange(
+            new string[] {
+                "DC/Private/UI/Widgets",
+            }
+        );
+
+        PublicDependencyModuleNames.AddRange(
             new string[] {
                 "Core",
                 "CoreUObject",

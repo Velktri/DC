@@ -11,12 +11,12 @@ void UDCEquipmentSlot::SelectEquipment(ADCEquippable* EquipmentItem) {
 }
 
 void UDCEquipmentSlot::ItemClick() {
-	if (OwningPC && OwningPC->EquippableRenderRef) {
-		if (EquipmentRef) {
+	if (OwningPC && OwningPC->EquippableRenderRef) 
+	{
+		if (EquipmentRef) 
+		{
 			SelectEquipment(EquipmentRef);
-			OwningPC->EquippableRenderRef->AppendEquipmentToRender();
-		} else {
-			OwningPC->EquippableRenderRef->AppendEquipmentToRender();
+			OwningPC->EquippableRenderRef->AppendEquipmentToRender(EquipmentRef);
 		}
 	}
 }
