@@ -9,10 +9,9 @@
 ADCItem::ADCItem() {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
-
 }
 
-FString ADCItem::GetItemName() {
+FText ADCItem::GetItemName() {
 	return ItemName;
 }
 
@@ -23,7 +22,5 @@ void ADCItem::BeginPlay()
 }
 
 void ADCItem::SetPlayerController(ADCPlayerController* NewOwner) {
-	if (MyOwner != NewOwner) {
-		MyOwner = NewOwner;
-	}
+	if (MyOwner != NewOwner) { MyOwner = NewOwner; }
 }

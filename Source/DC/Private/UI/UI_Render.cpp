@@ -74,7 +74,7 @@ void AUI_Render::SetNewRenderMesh(AActor* InActor, ECaptureStates InputState) {
 void AUI_Render::AppendEquipmentToRender(ADCEquippable* EquipmentPiece) {
 	if (RenderMesh)
 	{
-		switch (EquipmentPiece->SlotType) {
+		switch (EquipmentPiece->GetSlotType()) {
 		case ESlotType::Head:
 			EquipToSlot(EquipmentPiece, "Helm");
 			break;
@@ -88,6 +88,10 @@ void AUI_Render::AppendEquipmentToRender(ADCEquippable* EquipmentPiece) {
 			break;
 		}
 	}
+}
+
+USkeletalMeshComponent* AUI_Render::GetRenderMesh() {
+	return RenderMesh;
 }
 
 void AUI_Render::GetRenderElements(AActor* InActor) {
@@ -110,7 +114,7 @@ void AUI_Render::GetRenderElements(AActor* InActor) {
 			}
 
 			ADCEquippable* Equippable = Cast<ADCEquippable>(InActor);
-			InMesh = Equippable->EquippableMesh->SkeletalMesh;
+			InMesh = Equippable->GetEquippableMesh()->SkeletalMesh;
 			InAnimation = Equippable->UI_Animation;
 		}
 	} 
@@ -177,9 +181,9 @@ void AUI_Render::MoveCaptureCamera(ECaptureStates InputState) {
 
 void AUI_Render::EquipToSlot(ADCEquippable* InItem, FName SocketName) {
 	if (RenderMesh && InItem) {
-		RenderEquipment[InItem->SlotType]->SetSkeletalMesh(InItem->EquippableMesh->SkeletalMesh, true);
-		RenderEquipment[InItem->SlotType]->SetWorldScale3D(InItem->EquippableMesh->GetComponentScale());
-		RenderEquipment[InItem->SlotType]->AttachToComponent(RenderMesh, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepRelative, true), SocketName);
+		RenderEquipment[InItem->GetSlotType()]->SetSkeletalMesh(InItem->GetEquippableMesh()->SkeletalMesh, true);
+		RenderEquipment[InItem->GetSlotType()]->SetWorldScale3D(InItem->GetEquippableMesh()->GetComponentScale());
+		RenderEquipment[InItem->GetSlotType()]->AttachToComponent(RenderMesh, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepRelative, true), SocketName);
 	}
 }
 

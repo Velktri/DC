@@ -16,6 +16,7 @@ class DC_API ADCEquippable : public ADCItem
 	GENERATED_BODY()
 
 public:
+
 	ADCEquippable();
 
 	/** What happens when an item is unequipped */
@@ -29,6 +30,13 @@ public:
 
 	/** Detach the current Equippable from the player */
 	void DetachFromPlayer();
+
+	/*  GETTERS  */
+	ESlotType GetSlotType();
+	USkeletalMeshComponent* GetEquippableMesh();
+	UParticleSystemComponent* GetParticleSystem();
+
+protected:
 
 	/** Equippable Mesh */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Config)
@@ -47,6 +55,6 @@ public:
 	ESlotType SlotType;
 
 	/** Particle components for Equippable meshes */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Particles")
-	UParticleSystemComponent* OurParticleSystem;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Config)
+	UParticleSystemComponent* ParticleSystem;
 };

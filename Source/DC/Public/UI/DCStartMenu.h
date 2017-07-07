@@ -57,6 +57,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Config)
 	void Shoulder(bool LeftPressed);
 
+	UFUNCTION(BlueprintCallable, Category = Config)
+	void GamepadRightThumbstick(bool LeftPressed);
+
 	UFUNCTION(BlueprintImplementableEvent, Category = "Config")
 	void Shoulder_Pressed_Event(bool LeftPressed);
 };

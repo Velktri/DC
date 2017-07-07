@@ -17,8 +17,8 @@ ADCEquippable::ADCEquippable() {
 	EquippableMesh->SetupAttachment(RootComponent);
 
 	/* Add Particle slot to Equippable object. */
-	OurParticleSystem = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Particle Effects"));
-	OurParticleSystem->SetupAttachment(EquippableMesh);
+	ParticleSystem = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Particle Effects"));
+	ParticleSystem->SetupAttachment(EquippableMesh);
 
 	EquipSocket = "";
 }
@@ -37,7 +37,7 @@ void ADCEquippable::AttachToPlayer() {
 
 		USkeletalMeshComponent* Character = Cast<ADCCharacter>(MyOwner->GetPawn())->GetMesh();
 		EquippableMesh->SetHiddenInGame(false);
-		OurParticleSystem->SetHiddenInGame(false);
+		ParticleSystem->SetHiddenInGame(false);
 		EquippableMesh->AttachToComponent(Character, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepRelative, true), EquipSocket);
 	}
 }
@@ -46,5 +46,17 @@ void ADCEquippable::DetachFromPlayer() {
 	FDetachmentTransformRules rules(EDetachmentRule::KeepWorld, true);
 	EquippableMesh->DetachFromComponent(rules);
 	EquippableMesh->SetHiddenInGame(true);
-	OurParticleSystem->SetHiddenInGame(true);
+	ParticleSystem->SetHiddenInGame(true);
+}
+
+ESlotType ADCEquippable::GetSlotType() {
+	return SlotType;
+}
+
+USkeletalMeshComponent* ADCEquippable::GetEquippableMesh() {
+	return EquippableMesh;
+}
+
+UParticleSystemComponent* ADCEquippable::GetParticleSystem() {
+	return ParticleSystem;
 }

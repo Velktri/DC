@@ -9,11 +9,11 @@
 #include "Button.h"
 
 void UDCInventorySlot::ItemClick() {
-	if (OwningPC && OwningPC->EquippableRenderRef) {
+	if (OwningPC && OwningPC->GetUI_RenderRef()) {
 		if (ItemRef) {
-			OwningPC->EquippableRenderRef->SetNewRenderMesh(ItemRef, ECaptureStates::Equipment);
+			OwningPC->GetUI_RenderRef()->SetNewRenderMesh(ItemRef, ECaptureStates::Equipment);
 		} else {
-			OwningPC->EquippableRenderRef->SetNewRenderMesh(NULL, ECaptureStates::None);
+			OwningPC->GetUI_RenderRef()->SetNewRenderMesh(NULL, ECaptureStates::None);
 		}
 	}
 }

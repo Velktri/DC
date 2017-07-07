@@ -70,7 +70,6 @@ void ADCPlayerController::AddToInventory(ADCItem* InItem) {
 	for (size; size < MaxInventorySize; size++) {
 		if (!Inventory[size]) {
 			Inventory[size] = InItem;
-			UE_LOG(LogTemp, Warning, TEXT("You picked up a %s."), *InItem->GetItemName());
 			StartMenuWidget->AddInventoryItem(InItem);
 			return;
 		}
@@ -93,6 +92,14 @@ void ADCPlayerController::CreatePlayerWidgets() {
 
 class UDCGameUIWidget* ADCPlayerController::GetStartMenuWidget() {
 	return StartMenuWidget;
+}
+
+class AUI_Render* ADCPlayerController::GetUI_RenderRef() {
+	return EquippableRenderRef;
+}
+
+TMap<ESlotType, ADCEquippable*> ADCPlayerController::GetCurrentEquipment() {
+	return CurrentEquipment;
 }
 
 void ADCPlayerController::EquipEquippable(ADCEquippable* InItem) {
@@ -121,7 +128,7 @@ template< class T >
 void ADCPlayerController::EquipToSlot(ADCEquippable* InItem) {
 	T* ArmorItem = Cast<T>(InItem);
 	if (ArmorItem) {
-		T* CurrentArmor = Cast<T>(CurrentEquipment[ArmorItem->SlotType]);
+		T* CurrentArmor = Cast<T>(CurrentEquipment[ArmorItem->GetSlotType()]);
 		if (CurrentArmor == NULL) {
 			CurrentArmor = ArmorItem;
 			CurrentArmor->SetPlayerController(this);
@@ -132,6 +139,6 @@ void ADCPlayerController::EquipToSlot(ADCEquippable* InItem) {
 			CurrentArmor->SetPlayerController(this);
 			CurrentArmor->OnEquip();
 		}
-		CurrentEquipment[ArmorItem->SlotType] = CurrentArmor;
+		CurrentEquipment[ArmorItem->GetSlotType()] = CurrentArmor;
 	}
 }

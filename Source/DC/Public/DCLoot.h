@@ -14,27 +14,24 @@ public:
 	// Sets default values for this actor's properties
 	ADCLoot();
 
-	/** Loot Mesh */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Config)
-	UStaticMeshComponent* LootMesh;
-
 	/** The loot inside the loot bag */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Loot)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config | Loot")
 	TArray<TSubclassOf<class ADCItem>> LootContents;
 
-	/** Amount of money inside loot bag */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Loot)
-	int32 Money;
-
-	/** Returns the name of the loot contents */
-	UFUNCTION()
+	/*  GETTERS  */
 	TArray<TSubclassOf<class ADCItem>> GetLootContents();
-
-	/** Returns the amount of money in the loot */
-	UFUNCTION()
 	int32 GetMoney();
 
 protected:
+
+	/** Amount of money inside loot bag */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config | Loot")
+	int32 Money;
+
+	/** Loot Mesh */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config | Loot")
+	UStaticMeshComponent* LootMesh;
+
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 };

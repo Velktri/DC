@@ -10,6 +10,7 @@ class ADCEquippable;
 class UDCGameUIWidget;
 class ADCMeleeWeapon;
 class ADCArmor;
+class AUI_Render;
 
 /**
  * 
@@ -25,62 +26,78 @@ public:
 
 	/** Called when the game starts or when spawned */
 	virtual void BeginPlay() override;
-
-	/** Inventory for the Character. */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Inventory)
-	TArray<class ADCItem*> Inventory;
 	
-	/** Max Inventory size for the Character */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Inventory)
-	int32 MaxInventorySize;
-
-	/* Show StartMenu */
+	/** Show StartMenu */
 	UFUNCTION()
 	void PauseGame();
 
-	/* Hide StartMenu */
-	UFUNCTION(BlueprintCallable, Category = "Item")
+	/** Hide StartMenu */
+	UFUNCTION(BlueprintCallable)
 	void ResumeGame();
 
 	/** Allows the PlayerController to set up custom input bindings. */
 	virtual void SetupInputComponent() override;
 
+	/** Equip item to slot */
 	UFUNCTION()
-	TArray<class ADCItem*> GetInventory();
+	void EquipEquippable(ADCEquippable* InItem);
 
+	/** Equipment Helper */
+	template< class T >
+	void EquipToSlot(ADCEquippable* InItem);
+
+	/** Add item to Inventory */
 	UFUNCTION()
 	void AddToInventory(class ADCItem* InItem);
 
+	/** Generate Menu */
 	UFUNCTION()
 	void CreatePlayerWidgets();
+
+	/* GETTERS */
+	UFUNCTION()
+	TArray<class ADCItem*> GetInventory();
 
 	UFUNCTION()
 	UDCGameUIWidget* GetStartMenuWidget();
 
 	UFUNCTION()
-	void EquipEquippable(ADCEquippable* InItem);
+	AUI_Render* GetUI_RenderRef();
 
-	template< class T >
-	void EquipToSlot(ADCEquippable* InItem);
+	UFUNCTION()
+	TMap<ESlotType, ADCEquippable*> GetCurrentEquipment();
 
-	/** Widget for Start Menu */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = UI)
+protected:
+
+	/** Inventory for the Character. */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config | Inventory")
+	TArray<class ADCItem*> Inventory;
+
+	/** Max Inventory size for the Character */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config | Inventory")
+	int32 MaxInventorySize;
+
+	/** Current Equipment the character is holding. */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config | Inventory")
+	TMap<ESlotType, ADCEquippable*> CurrentEquipment;
+
+	/** Widget class for Start Menu */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config | UI")
 	TSubclassOf<class UUserWidget> StartMenuClass;
 
 	/** Widget instance for Start Menu */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = UI)
-	class UDCGameUIWidget* StartMenuWidget;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config | UI")
+	UDCGameUIWidget* StartMenuWidget;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = UI)
+	/** Pause state of the Game */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config | UI")
 	bool bIsPaused;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = UI)
-	class AUI_Render* EquippableRenderRef;
+	/** UI Render Reference */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config | UI")
+	AUI_Render* EquippableRenderRef;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Classes)
+	/** UI Render class */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config | Classes")
 	TSubclassOf<class AActor> EquippableRenderClass;
-
-	/** Current Equipment the character is holding. */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Inventory)
-	TMap<ESlotType, ADCEquippable*> CurrentEquipment;
 };

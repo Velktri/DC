@@ -12,12 +12,13 @@
 #include "Button.h"
 #include "WidgetAnimation.h"
 #include "EngineUtils.h"
+#include "Engine.h"
 
 void UDCStartMenu::B_Pressed() {
 	if (OwningPC) {
 		OwningPC->ResumeGame();
-		if (OwningPC->EquippableRenderRef) {
-			Cast<AUI_Render>(OwningPC->EquippableRenderRef)->SetNewRenderMesh(OwningPC->GetPawn(), ECaptureStates::InGame);
+		if (OwningPC->GetUI_RenderRef()) {
+			Cast<AUI_Render>(OwningPC->GetUI_RenderRef())->SetNewRenderMesh(OwningPC->GetPawn(), ECaptureStates::InGame);
 		}
 	}
 }
@@ -44,26 +45,26 @@ void UDCStartMenu::InitCurrentRenderTarget() {
 		case 0:
 			if (OwningPC)
 			{
-				Cast<AUI_Render>(OwningPC->EquippableRenderRef)->SetNewRenderMesh(OwningPC->GetPawn(), ECaptureStates::Character);	
+				Cast<AUI_Render>(OwningPC->GetUI_RenderRef())->SetNewRenderMesh(OwningPC->GetPawn(), ECaptureStates::Character);	
 			}
 			break;
 		case 1:
 			if (OwningPC) 
 			{
-				Cast<AUI_Render>(OwningPC->EquippableRenderRef)->SetNewRenderMesh(OwningPC->GetPawn(), ECaptureStates::Character);
+				Cast<AUI_Render>(OwningPC->GetUI_RenderRef())->SetNewRenderMesh(OwningPC->GetPawn(), ECaptureStates::Character);
 			}
 			break;
 		case 2:
 			if (OwningPC && InventoryMenu && InventoryMenu->PrimaryFocusWidget)
 			{
 				UDCInventorySlot* InvSlot = Cast<UDCInventorySlot>(InventoryMenu->PrimaryFocusWidget);
-				if (InvSlot && OwningPC->EquippableRenderRef)
+				if (InvSlot && OwningPC->GetUI_RenderRef())
 				{
-					OwningPC->EquippableRenderRef->SetNewRenderMesh(InvSlot->ItemRef, ECaptureStates::Equipment);
+					OwningPC->GetUI_RenderRef()->SetNewRenderMesh(InvSlot->ItemRef, ECaptureStates::Equipment);
 				} 
 				else 
 				{
-					OwningPC->EquippableRenderRef->SetNewRenderMesh(NULL, ECaptureStates::None);
+					OwningPC->GetUI_RenderRef()->SetNewRenderMesh(NULL, ECaptureStates::None);
 				}
 			}
 			break;
@@ -101,6 +102,8 @@ void UDCStartMenu::SetWidgetFocus(UWidget* InWidget) {
 void UDCStartMenu::DetermineKeyEvent(FKey InKey) {
 	if (!bIsBlockingInput)
 	{
+		//UE_LOG(LogTemp, Warning, TEXT("%s"), *(InKey->GetDisplayName()));
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FText(InKey.GetDisplayName()).ToString());
 		if (InKey == EKeys::Gamepad_FaceButton_Right)
 		{
 			B_Pressed();
@@ -118,6 +121,10 @@ void UDCStartMenu::DetermineKeyEvent(FKey InKey) {
 		{
 			bIsBlockingInput = true;
 			Shoulder_Pressed_Event(false);
+		}
+		else if (InKey == EKeys::Gamepad_RightStick_Right || InKey == EKeys::Gamepad_RightStick_Left)
+		{
+			GamepadRightThumbstick((InKey == EKeys::Gamepad_RightStick_Left) ? true : false);
 		}
 	}
 }
@@ -149,4 +156,8 @@ void UDCStartMenu::Shoulder(bool LeftPressed) {
 	}
 
 	InitCurrentRenderTarget();
+}
+
+void UDCStartMenu::GamepadRightThumbstick(bool LeftPressed) {
+
 }

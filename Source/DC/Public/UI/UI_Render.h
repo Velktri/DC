@@ -35,50 +35,52 @@ class DC_API AUI_Render : public AActor
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
 	AUI_Render();
-
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-public:	
 
 	/** Called by outside functions to update Render Target */
 	UFUNCTION(BlueprintCallable)
 	void SetNewRenderMesh(class AActor* InActor, ECaptureStates InputState);
 
+
+	/** Add equipment to Mesh */
+	UFUNCTION(Category = "Config")
+	void AppendEquipmentToRender(ADCEquippable* EquipmentPiece);
+
+	/** Owning Player Controller */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config | Inventory")
+	class ADCPlayerController* OwningPC;
+
+	/* GETTERS */
+	UFUNCTION()
+	USkeletalMeshComponent* GetRenderMesh();
+
+protected:
+	/** Called when the game starts or when spawned */
+	virtual void BeginPlay() override;
+
 	/** Capture Component */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Components)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config | Components")
 	USceneComponent* DefaultSceneRoot;
 
 	/** Capture Component */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Components)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config | Components")
 	class USceneCaptureComponent2D* CaptureComponent;
 
 	/** Lighting */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Components)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config | Components")
 	UPointLightComponent* PointLight;
 
 	/** Mesh Root */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Components)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config | Components")
 	USceneComponent* MeshRoot;
 
 	/** Render Mesh */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Components)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config | Components")
 	USkeletalMeshComponent* RenderMesh;
 
-	/** Add equipment to Mesh */
-	UFUNCTION(Category = Config)
-	void AppendEquipmentToRender(ADCEquippable* EquipmentPiece);
-
 	/** Current Equipment the character is holding. */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Inventory)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config | Inventory")
 	TMap<ESlotType, USkeletalMeshComponent*> RenderEquipment;
-
-	/** Current Equipment the character is holding. */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Inventory)
-	class ADCPlayerController* OwningPC;
 
 private:
 	USkeletalMesh* InMesh;
@@ -96,5 +98,6 @@ private:
 
 	void MoveCaptureCamera(ECaptureStates InputState);
 
+	/** Attach Render Equipment to Render Mesh */
 	void EquipToSlot(ADCEquippable* InItem, FName SocketName);
 };

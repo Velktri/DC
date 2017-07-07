@@ -17,7 +17,7 @@ public:
 
 	/** Returns the name of the item */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Config)
-	FString ItemName;
+	FText ItemName;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Config)
 	UTexture* InventoryImage;
@@ -27,7 +27,7 @@ public:
 	UAnimationAsset* UI_Animation;
 
 	/** Get Weapon Name */
-	FString GetItemName();
+	FText GetItemName();
 
 	/** Sets the item's owner */
 	void SetPlayerController(class ADCPlayerController* NewOwner);

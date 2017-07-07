@@ -8,10 +8,11 @@
 #include "DCPlayerController.h"
 
 UDCGameUIWidget* UDCEquipmentMenu::GenerateEquipSlot(ESlotType EquipSlot, ADCEquippable* Selection) {
-	if (OwningPC && Selection && Selection->SlotType == EquipSlot) {
+	if (OwningPC && Selection && Selection->GetSlotType() == EquipSlot) {
 		UDCGameUIWidget* ChildWidget = CreateWidget<UDCGameUIWidget>(OwningPC, EquipmentSlotClass);
 		if (ChildWidget) {
 			EquipmentSlotContainer->AddChild(ChildWidget);
+			Cast<UDCEquipmentSlot>(ChildWidget)->OwnerMenu = this;
 			return ChildWidget;
 		}
 	}
@@ -21,7 +22,7 @@ UDCGameUIWidget* UDCEquipmentMenu::GenerateEquipSlot(ESlotType EquipSlot, ADCEqu
 void UDCEquipmentMenu::SetFilter(ESlotType InType) {
 	ClearFilter();
 	if (OwningPC) {
-		for (auto& item : OwningPC->Inventory) {
+		for (auto& item : OwningPC->GetInventory()) {
 			ADCEquippable* EquipItem = Cast<ADCEquippable>(item);
 			if (EquipItem)
 			{
@@ -30,7 +31,6 @@ void UDCEquipmentMenu::SetFilter(ESlotType InType) {
 				{
 					Cast<UDCEquipmentSlot>(widget)->EquipmentRef = EquipItem;
 				}
-
 			}
 		}
 	}
@@ -39,4 +39,3 @@ void UDCEquipmentMenu::SetFilter(ESlotType InType) {
 void UDCEquipmentMenu::ClearFilter() {
 	if (EquipmentSlotContainer) { EquipmentSlotContainer->ClearChildren(); }
 }
-

@@ -10,7 +10,7 @@
 
 void UDCInventoryMenu::InitInventory() {
 	if (OwningPC) {
-		TArray<ADCItem*> Inventory = OwningPC->Inventory;
+		TArray<ADCItem*> Inventory = OwningPC->GetInventory();
 		for (int i = 0; i < Inventory.Num(); i++) {
 			UDCInventorySlot* ChildWidget = CreateWidget<UDCInventorySlot>(OwningPC, InventorySlotClass);
 			UUniformGridSlot* gridSlot = InventoryContents->AddChildToUniformGrid(ChildWidget);
@@ -24,8 +24,8 @@ void UDCInventoryMenu::InitInventory() {
 }
 
 void UDCInventoryMenu::TickFunc(float DeltaTime) {
-	if (OwningPC && OwningPC->EquippableRenderRef) {
+	if (OwningPC && OwningPC->GetUI_RenderRef()) {
 		FRotator rot = FRotator(0, 50 * DeltaTime, 0);
-		Cast<AUI_Render>(OwningPC->EquippableRenderRef)->RenderMesh->AddLocalRotation(rot);
+		Cast<AUI_Render>(OwningPC->GetUI_RenderRef())->GetRenderMesh()->AddLocalRotation(rot);
 	}
 }

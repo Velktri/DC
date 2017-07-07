@@ -33,4 +33,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Config")
 	void ClearFilter();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Config)
+	class UTextBlock* ItemName;
 };

@@ -179,8 +179,8 @@ void ADCCharacter::ProcessLoot(AActor* OtherActor) {
 			ADCItem* Spawner = GetWorld()->SpawnActor<ADCItem>(loot);
 
 			if (Spawner && Spawner->IsA(ADCEquippable::StaticClass())) {
-				Cast<ADCEquippable>(Spawner)->EquippableMesh->SetHiddenInGame(true);
-				Cast<ADCEquippable>(Spawner)->OurParticleSystem->SetHiddenInGame(true);
+				Cast<ADCEquippable>(Spawner)->GetEquippableMesh()->SetHiddenInGame(true);
+				Cast<ADCEquippable>(Spawner)->GetParticleSystem()->SetHiddenInGame(true);
 
 				AController* PC = GetController();
 				if (PC)
@@ -194,7 +194,7 @@ void ADCCharacter::ProcessLoot(AActor* OtherActor) {
 
 void ADCCharacter::Attack() {
 	if (GetController() && GetController()->IsA(ADCPlayerController::StaticClass())) {
-		ADCMeleeWeapon* CurrentWeapon = Cast<ADCMeleeWeapon>(Cast<ADCPlayerController>(GetController())->CurrentEquipment[ESlotType::RightWeapon]);
+		ADCMeleeWeapon* CurrentWeapon = Cast<ADCMeleeWeapon>(Cast<ADCPlayerController>(GetController())->GetCurrentEquipment()[ESlotType::RightWeapon]);
 		if (CurrentWeapon != NULL && ActionState == ECharState::I) {
 			ActionState = ECharState::A;
 
@@ -219,7 +219,7 @@ void ADCCharacter::Attack() {
 void ADCCharacter::EndAttack() {
 	if (GetController() && GetController()->IsA(ADCPlayerController::StaticClass())) {
 		ActionState = ECharState::I;
-		Cast<ADCMeleeWeapon>(Cast<ADCPlayerController>(GetController())->CurrentEquipment[ESlotType::RightWeapon])->GetCollisionComp()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		Cast<ADCMeleeWeapon>(Cast<ADCPlayerController>(GetController())->GetCurrentEquipment()[ESlotType::RightWeapon])->GetCollisionComp()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 }
 
