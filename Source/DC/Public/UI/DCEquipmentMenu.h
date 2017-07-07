@@ -23,15 +23,18 @@ public:
 	class UPanelWidget* EquipmentSlotContainer;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Config)
-	class UButton* FocusButton;
+	uint8 ActiveEquipmentFilter;
 
-	UFUNCTION(BlueprintCallable, Category = "Config")
+	UFUNCTION(BlueprintCallable, Category = Config)
 	UDCGameUIWidget* GenerateEquipSlot(ESlotType EquipSlot, ADCEquippable* Selection);
 
-	UFUNCTION(BlueprintCallable, Category = "Config")
+	UFUNCTION(BlueprintCallable, Category = Config)
 	void SetFilter(ESlotType InType);
 
-	UFUNCTION(BlueprintCallable, Category = "Config")
+	UFUNCTION(BlueprintCallable, Category = Config)
+	void ChangeFilter(bool LeftPressed);
+
+	UFUNCTION(BlueprintCallable, Category = Config)
 	void ClearFilter();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Config)

@@ -9,7 +9,7 @@
 #include "DCInventoryMenu.h"
 #include "DCInventorySlot.h"
 #include "DCItem.h"
-#include "Button.h"
+#include "ScrollBox.h"
 #include "WidgetAnimation.h"
 #include "EngineUtils.h"
 #include "Engine.h"
@@ -82,14 +82,7 @@ void UDCStartMenu::InitCurrentRenderTarget() {
 void UDCStartMenu::SetWidgetFocus(UWidget* InWidget) {
 	if (InWidget)
 	{
-		if (InWidget->IsA(UDCEquipmentMenu::StaticClass()))
-		{
-			UButton* DCEquipWidget = Cast<UDCEquipmentMenu>(InWidget)->FocusButton;
-			if (DCEquipWidget) {
-				DCEquipWidget->SetUserFocus(OwningPC);
-			}
-		} 
-		else if (InWidget->IsA(UDCGameUIWidget::StaticClass()))
+		if (InWidget->IsA(UDCGameUIWidget::StaticClass()))
 		{
 			UDCGameUIWidget* DCWidget = Cast<UDCGameUIWidget>(InWidget)->PrimaryFocusWidget;
 			if (DCWidget) {
@@ -102,7 +95,6 @@ void UDCStartMenu::SetWidgetFocus(UWidget* InWidget) {
 void UDCStartMenu::DetermineKeyEvent(FKey InKey) {
 	if (!bIsBlockingInput)
 	{
-		//UE_LOG(LogTemp, Warning, TEXT("%s"), *(InKey->GetDisplayName()));
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FText(InKey.GetDisplayName()).ToString());
 		if (InKey == EKeys::Gamepad_FaceButton_Right)
 		{
@@ -112,15 +104,10 @@ void UDCStartMenu::DetermineKeyEvent(FKey InKey) {
 		{
 			Y_Pressed();
 		}
-		else if (InKey == EKeys::Gamepad_LeftShoulder) 
+		else if (InKey == EKeys::Gamepad_LeftShoulder || InKey == EKeys::Gamepad_RightShoulder)
 		{
 			bIsBlockingInput = true;
-			Shoulder_Pressed_Event(true);
-		}
-		else if (InKey == EKeys::Gamepad_RightShoulder)
-		{
-			bIsBlockingInput = true;
-			Shoulder_Pressed_Event(false);
+			Shoulder_Pressed_Event((InKey == EKeys::Gamepad_LeftShoulder) ? true : false);
 		}
 		else if (InKey == EKeys::Gamepad_RightStick_Right || InKey == EKeys::Gamepad_RightStick_Left)
 		{
@@ -159,5 +146,8 @@ void UDCStartMenu::Shoulder(bool LeftPressed) {
 }
 
 void UDCStartMenu::GamepadRightThumbstick(bool LeftPressed) {
-
+	if (ActiveMenuIndex == 1 && EquipmentMenu)
+	{
+		EquipmentMenu->ChangeFilter(LeftPressed);
+	}
 }

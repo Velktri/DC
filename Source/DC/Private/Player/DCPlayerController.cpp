@@ -61,10 +61,6 @@ void ADCPlayerController::SetupInputComponent() {
 	InputComponent->BindAction("StartMenu", IE_Pressed, this, &ADCPlayerController::PauseGame);
 }
 
-TArray<class ADCItem*> ADCPlayerController::GetInventory() {
-	return Inventory;
-}
-
 void ADCPlayerController::AddToInventory(ADCItem* InItem) {
 	int size = 0;
 	for (size; size < MaxInventorySize; size++) {
@@ -88,18 +84,6 @@ void ADCPlayerController::CreatePlayerWidgets() {
 	}
 
 	if (EquippableRenderRef) { EquippableRenderRef->SetNewRenderMesh(GetPawn(), ECaptureStates::InGame); }
-}
-
-class UDCGameUIWidget* ADCPlayerController::GetStartMenuWidget() {
-	return StartMenuWidget;
-}
-
-class AUI_Render* ADCPlayerController::GetUI_RenderRef() {
-	return EquippableRenderRef;
-}
-
-TMap<ESlotType, ADCEquippable*> ADCPlayerController::GetCurrentEquipment() {
-	return CurrentEquipment;
 }
 
 void ADCPlayerController::EquipEquippable(ADCEquippable* InItem) {
@@ -142,3 +126,20 @@ void ADCPlayerController::EquipToSlot(ADCEquippable* InItem) {
 		CurrentEquipment[ArmorItem->GetSlotType()] = CurrentArmor;
 	}
 }
+
+UDCGameUIWidget* ADCPlayerController::GetStartMenuWidget() { 
+	return StartMenuWidget; 
+}
+
+AUI_Render* ADCPlayerController::GetUI_RenderRef() { 
+	return EquippableRenderRef; 
+}
+
+TMap<ESlotType, ADCEquippable*> ADCPlayerController::GetCurrentEquipment() { 
+	return CurrentEquipment; 
+}
+
+TArray<ADCItem*> ADCPlayerController::GetInventory() { 
+	return Inventory; 
+}
+

@@ -21,12 +21,15 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Config)
 	class UDCEquipmentMenu* OwnerMenu;
 
-	UFUNCTION(BlueprintCallable, Category = "Config")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Config)
+	class UButton* InventoryButton;
+
+	UFUNCTION(BlueprintCallable, Category = Config)
 	void SelectEquipment(class ADCEquippable* EquipmentItem);
 	
-	UFUNCTION(BlueprintCallable, Category = "Config")
+	UFUNCTION(BlueprintCallable, Category = Config)
 	void ItemClick();
 	
-	UFUNCTION(BlueprintCallable, Category = "Config")
+	UFUNCTION(BlueprintCallable, Category = Config)
 	void SetDetails(ADCEquippable* InItem);
 };

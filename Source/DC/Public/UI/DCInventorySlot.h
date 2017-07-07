@@ -22,9 +22,9 @@ public:
 	class UButton* InventoryButton;
 
 	
-	UFUNCTION(BlueprintCallable, Category = "Config")
+	UFUNCTION(BlueprintCallable, Category = Config)
 	void ItemClick();
 
-	UFUNCTION(BlueprintCallable, Category = "Config")
+	UFUNCTION(BlueprintCallable, Category = Config)
 	void UpdateAddedItem(ADCItem* InItem);
 };

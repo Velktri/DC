@@ -24,9 +24,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Config)
 	int InventoryPanelWidth;
 
-	UFUNCTION(BlueprintCallable, Category = "Config")
+	UFUNCTION(BlueprintCallable, Category = Config)
 	void InitInventory();
 
-	UFUNCTION(BlueprintCallable, Category = "Config")
+	UFUNCTION(BlueprintCallable, Category = Config)
 	void TickFunc(float DeltaTime);
 };
