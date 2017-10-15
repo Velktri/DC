@@ -1,7 +1,6 @@
 // Copyright 1998-2017 Epic Games, Inc. All Rights Reserved.
 
 #include "DC.h"
-#include "Kismet/HeadMountedDisplayFunctionLibrary.h"
 #include "DCCharacter.h"
 #include "DCMeleeWeapon.h"
 #include "DCLoot.h"
@@ -10,6 +9,9 @@
 #include "EngineUtils.h"
 #include "DCPlayerController.h"
 #include "DCGameUIWidget.h"
+
+FName ADCCharacter::RightFootIKSocket(TEXT("RightFootIKSocket"));
+FName ADCCharacter::LeftFootIKSocket(TEXT("LeftFootIKSocket"));
 
 ADCCharacter::ADCCharacter() {
 
@@ -45,6 +47,11 @@ ADCCharacter::ADCCharacter() {
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
+	IKInterpSpeed = 15.0f;
+	IKTraceDistance = 50.0f;
+	Scale = 0;
+	IKOffsetLeftFoot = 0;
+	IKOffsetRightFoot = 0;
 }
 
 void ADCCharacter::BeginPlay()
@@ -60,6 +67,12 @@ void ADCCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
+	/* IK Foot */
+	IKOffsetRightFoot = FMath::FInterpTo(IKOffsetRightFoot, IKFootTrace(IKTraceDistance, ADCCharacter::RightFootIKSocket), DeltaSeconds, IKInterpSpeed);
+
+	IKOffsetLeftFoot = FMath::FInterpTo(IKOffsetLeftFoot, IKFootTrace(IKTraceDistance, ADCCharacter::LeftFootIKSocket), DeltaSeconds, IKInterpSpeed);
+
+	/* Targting */
 	if (bIsLockedOn) {
 		float EnemyDistance = FVector::Dist(GetActorLocation(), LockOnTarget->GetActorLocation());
 		if (LockOnTarget == NULL || LockOnTarget->IsPendingKill() || (EnemyDistance > (LOCKON_RADIUS * 1.2))) {
@@ -104,6 +117,47 @@ void ADCCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputC
 
 	/** Equippable Attacks */
 	InputComponent->BindAction("Attack", IE_Pressed, this, &ADCCharacter::Attack);
+}
+
+void ADCCharacter::OnConstruction(const FTransform& Transform)
+{
+	Scale = Transform.GetScale3D().Z;
+	IKTraceDistance = GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight() * Scale;
+}
+
+float ADCCharacter::IKFootTrace(float TraceDistance, FName Socket)
+{
+	USkeletalMeshComponent* CharMesh = GetMesh();
+	if (CharMesh)
+	{
+		FVector StartVector = CharMesh->GetSocketLocation(Socket);
+		FVector EndVector = StartVector;
+
+		StartVector.Z = GetActorLocation().Z;
+		EndVector.Z = GetActorLocation().Z - TraceDistance;
+		UWorld* World = GetWorld();
+		if (World)
+		{
+			FHitResult Hit;
+			FCollisionQueryParams Query;
+			Query.bTraceComplex = true;
+			Query.AddIgnoredActor(this);
+			if (World->LineTraceSingleByChannel(Hit, StartVector, EndVector, ECollisionChannel::ECC_Visibility, Query))
+			{		
+				return (EndVector - Hit.Location).Size() / Scale;
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("Could not find World for %s"), *GetName());
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Could not find mesh for %s"), *GetName());
+	}
+
+	return 0.0f;
 }
 
 void ADCCharacter::TurnAtRate(float Rate)

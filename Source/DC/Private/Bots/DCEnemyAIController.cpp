@@ -49,16 +49,22 @@ void ADCEnemyAIController::FindMainCharacter() {
 	const FVector MyLoc = MyBot->GetActorLocation();
 
 	ADCCharacter* BestPawn = Cast<ADCCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
-	ADCEnemy* MyDCBot = Cast<ADCEnemy>(MyBot);
-	if (MyDCBot)
+	if (BestPawn)
 	{
-		const float DistSq = (BestPawn->GetActorLocation() - MyLoc).SizeSquared();
-		if (DistSq <= (MyDCBot->SightDistance * MyDCBot->SightDistance)) {
-			if (BestPawn) {
-				SetEnemy(BestPawn);
+		ADCEnemy* MyDCBot = Cast<ADCEnemy>(MyBot);
+		if (MyDCBot)
+		{
+			const float DistSq = (BestPawn->GetActorLocation() - MyLoc).SizeSquared();
+			if (DistSq <= (MyDCBot->SightDistance * MyDCBot->SightDistance))
+			{
+				if (BestPawn)
+				{
+					SetEnemy(BestPawn);
+				}
 			}
 		}
 	}
+
 }
 
 ADCCharacter* ADCEnemyAIController::GetEnemy() const {

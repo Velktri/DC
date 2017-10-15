@@ -124,6 +124,31 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Inventory)
 	int32 EquippedItemSlot;
 
+	/*********************** IK Foot/Hands **************************/
+	virtual void OnConstruction(const FTransform& Transform) override;
+
+	float Scale;
+	float IKTraceDistance;
+
+public:
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = IK)
+	float IKOffsetRightFoot;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = IK)
+	float IKOffsetLeftFoot;
+
+protected:
+	float IKInterpSpeed;
+
+	static FName RightFootIKSocket;
+	static FName LeftFootIKSocket;
+
+	float IKFootTrace(float TraceDistance, FName Socket);
+
+
+	/****************************************************************/
+
 public:
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
