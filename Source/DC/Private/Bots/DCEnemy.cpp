@@ -30,7 +30,7 @@ void ADCEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) 
 }
 
 void ADCEnemy::SpawnLoot() {
-	TArray<TSubclassOf<class ADCItem>> lootArray;
+	TArray<TSubclassOf<ADCItem>> lootArray;
 	Items.GenerateKeyArray(lootArray);
 	int32 NumItems = lootArray.Num();
 	for (int32 i = 0; i < NumItems; i++) {

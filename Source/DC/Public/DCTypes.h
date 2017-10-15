@@ -24,7 +24,7 @@ enum class ESlotType : uint8 {
 };
 
 /** Struct that holds a weapon's Stat points */
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FEquipmentStats {
 	GENERATED_BODY()
 

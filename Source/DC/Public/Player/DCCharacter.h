@@ -21,10 +21,7 @@ class ADCCharacter : public ACharacter {
 public:
 	ADCCharacter();
 
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
-	/** Update the character. (Running, health etc). */
 	virtual void Tick(float DeltaSeconds) override;
 
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
@@ -36,24 +33,32 @@ public:
 	float BaseLookUpRate;
 
 	/** Max health of the Pawn. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Stats)
 	int32 Health;
 
+	/** Init health of the Pawn. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Stats)
+	int32 StartingHealth;
+
 	/** Current health of the Pawn. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Stats)
 	int32 CurrentHealth;
 
 	/** Max Energy of the Pawn. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Stats)
 	int32 Energy;
 
+	/** Init Energy of the Pawn. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Stats)
+	int32 StartingEnergy;
+
 	/** Current Energy of the Pawn. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Stats)
 	int32 CurrentEnergy;
 
 	/** Determine what is in the lootbag. */
 	UFUNCTION()
-	void ProcessLoot(AActor* OtherActor);
+	void ProcessLoot(TArray<TSubclassOf<ADCItem>> lootItems);
 
 	void Attack();
 
@@ -73,10 +78,6 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Config)
 	ECharState ActionState;
 
-	/** Collision for Character */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Collision)
-	UBoxComponent* CollisionComp;
-
 	UFUNCTION()
 	UAnimationAsset* GetUIAnimation();
 
@@ -84,9 +85,6 @@ protected:
 
 	UFUNCTION()
 	void OnCollision(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult);
-
-	/** Resets HMD orientation in VR. */
-	void OnResetVR();
 
 	/** Called for forwards/backward input */
 	void MoveForward(float Value);
@@ -106,22 +104,20 @@ protected:
 	 */
 	void LookUpAtRate(float Rate);
 
-	/** Handler for when a touch input begins. */
-	void TouchStarted(ETouchIndex::Type FingerIndex, FVector Location);
-
-	/** Handler for when a touch input stops. */
-	void TouchStopped(ETouchIndex::Type FingerIndex, FVector Location);
-
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	// End of APawn interface
 
 	/** Animation for a horizontal slash attack. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config | Animation")
 	UAnimMontage* HorzontalSlash;
 
+	/** Pawn Defensive Animation. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config | Animation")
+	UAnimMontage* DefensiveAnimation;
+
 	/** Animation to play in the Start Menu. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config | Animation")
 	UAnimationAsset* UI_Animation;
 
 	/* Pointer to the equipped item slot */
@@ -129,9 +125,7 @@ protected:
 	int32 EquippedItemSlot;
 
 public:
-	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
-	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 };
 

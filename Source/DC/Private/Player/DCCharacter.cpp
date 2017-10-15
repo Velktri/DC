@@ -5,6 +5,7 @@
 #include "DCCharacter.h"
 #include "DCMeleeWeapon.h"
 #include "DCLoot.h"
+#include "DCItem.h"
 #include "DCEnemy.h"
 #include "EngineUtils.h"
 #include "DCPlayerController.h"
@@ -14,15 +15,11 @@ ADCCharacter::ADCCharacter() {
 
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
+	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &ADCCharacter::OnCollision);
 
 	// set our turn rates for input
 	BaseTurnRate = 45.f;
 	BaseLookUpRate = 45.f;
-
-	/* Collision */
-	CollisionComp = CreateDefaultSubobject<UBoxComponent>(TEXT("CollisionComp"));
-	CollisionComp->SetupAttachment(RootComponent);
-	CollisionComp->OnComponentBeginOverlap.AddDynamic(this, &ADCCharacter::OnCollision);
 
 	// Don't rotate when the controller rotates. Let that just affect the camera.
 	bUseControllerRotationPitch = false;
@@ -50,14 +47,17 @@ ADCCharacter::ADCCharacter() {
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
 }
 
-void ADCCharacter::BeginPlay() {
+void ADCCharacter::BeginPlay()
+{
 	Super::BeginPlay();
 	ActionState = ECharState::I;
-	CurrentHealth = Health;
-	CurrentEnergy = Energy;
+
+	CurrentHealth = StartingHealth;
+	CurrentEnergy = StartingEnergy;
 }
 
-void ADCCharacter::Tick(float DeltaSeconds) {
+void ADCCharacter::Tick(float DeltaSeconds)
+{
 	Super::Tick(DeltaSeconds);
 
 	if (bIsLockedOn) {
@@ -96,13 +96,6 @@ void ADCCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputC
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis("LookUpRate", this, &ADCCharacter::LookUpAtRate);
 
-	// handle touch devices
-	PlayerInputComponent->BindTouch(IE_Pressed, this, &ADCCharacter::TouchStarted);
-	PlayerInputComponent->BindTouch(IE_Released, this, &ADCCharacter::TouchStopped);
-
-	// VR headset functionality
-	PlayerInputComponent->BindAction("ResetVR", IE_Pressed, this, &ADCCharacter::OnResetVR);
-
 	/** Equippable swapping */
 	//InputComponent->BindAction("NextEquippable", IE_Pressed, this, &ADCCharacter::EquipNextEquippable);
 
@@ -111,22 +104,6 @@ void ADCCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputC
 
 	/** Equippable Attacks */
 	InputComponent->BindAction("Attack", IE_Pressed, this, &ADCCharacter::Attack);
-}
-
-
-void ADCCharacter::OnResetVR()
-{
-	UHeadMountedDisplayFunctionLibrary::ResetOrientationAndPosition();
-}
-
-void ADCCharacter::TouchStarted(ETouchIndex::Type FingerIndex, FVector Location)
-{
-		Jump();
-}
-
-void ADCCharacter::TouchStopped(ETouchIndex::Type FingerIndex, FVector Location)
-{
-		StopJumping();
 }
 
 void ADCCharacter::TurnAtRate(float Rate)
@@ -171,14 +148,15 @@ void ADCCharacter::MoveRight(float Value)
 }
 
 
-void ADCCharacter::ProcessLoot(AActor* OtherActor) {
-	ADCLoot* EquippableLoot = Cast<ADCLoot>(OtherActor);
-	if (EquippableLoot) {
-		TArray<TSubclassOf<ADCItem>> lootItems = EquippableLoot->GetLootContents();
-		for (TSubclassOf<ADCItem> loot : lootItems) {
+void ADCCharacter::ProcessLoot(TArray<TSubclassOf<ADCItem>> lootItems)
+{
+	for (TSubclassOf<ADCItem> loot : lootItems)
+	{
+		if (loot)
+		{
 			ADCItem* Spawner = GetWorld()->SpawnActor<ADCItem>(loot);
-
-			if (Spawner && Spawner->IsA(ADCEquippable::StaticClass())) {
+			if (Spawner && Spawner->IsA(ADCEquippable::StaticClass()))
+			{
 				Cast<ADCEquippable>(Spawner)->GetEquippableMesh()->SetHiddenInGame(true);
 				Cast<ADCEquippable>(Spawner)->GetParticleSystem()->SetHiddenInGame(true);
 
@@ -256,7 +234,8 @@ UAnimationAsset* ADCCharacter::GetUIAnimation() {
 
 void ADCCharacter::OnCollision(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult) {
 	if (OtherActor->IsA(ADCLoot::StaticClass())) {
-		ProcessLoot(OtherActor);
+
+		ProcessLoot(Cast<ADCLoot>(OtherActor)->GetLootContents());
 
 		OtherActor->Destroy();
 	}

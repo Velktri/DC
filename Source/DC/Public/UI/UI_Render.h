@@ -18,7 +18,7 @@ enum class ECaptureStates : uint8 {
 	None			UMETA(DisplayName = "None"),
 };
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FCameraVectors {
 	GENERATED_BODY()
 

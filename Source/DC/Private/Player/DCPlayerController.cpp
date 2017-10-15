@@ -31,10 +31,11 @@ ADCPlayerController::ADCPlayerController() {
 void ADCPlayerController::BeginPlay() {
 	Super::BeginPlay();
 
-	FVector SpawnLoc = FVector(0.0f, 2000000.0f, 0.0f);
-	FRotator Rot = FRotator(0.0f, 180.0f, 0.0f);
 	if (EquippableRenderClass) {
 		FActorSpawnParameters SpawnParams;
+		FVector SpawnLoc = FVector(0.0f, 2000000.0f, 0.0f);
+		FRotator Rot = FRotator(0.0f, 180.0f, 0.0f);
+
 		EquippableRenderRef = GetWorld()->SpawnActor<AUI_Render>(EquippableRenderClass, SpawnLoc, Rot, SpawnParams);
 		EquippableRenderRef->OwningPC = this;
 	}
