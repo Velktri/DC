@@ -81,6 +81,15 @@ public:
 	UFUNCTION()
 	UAnimationAsset* GetUIAnimation();
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class ADCChest* FocusedChest;
+
+	UFUNCTION()
+	void Open();
+
+	UFUNCTION(BlueprintCallable)
+	virtual void Jump() override;
+
 protected:
 
 	UFUNCTION()
@@ -124,6 +133,10 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Inventory)
 	int32 EquippedItemSlot;
 
+	/* Pointer to the equipped item slot */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Environment)
+	class UDCWeatherComponent* WeatherComponent;
+
 	/*********************** IK Foot/Hands **************************/
 	virtual void OnConstruction(const FTransform& Transform) override;
 
@@ -145,9 +158,8 @@ protected:
 	static FName LeftFootIKSocket;
 
 	float IKFootTrace(float TraceDistance, FName Socket);
-
-
 	/****************************************************************/
+
 
 public:
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }

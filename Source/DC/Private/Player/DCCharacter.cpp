@@ -4,18 +4,19 @@
 #include "DCCharacter.h"
 #include "DCMeleeWeapon.h"
 #include "DCLoot.h"
+#include "DCChest.h"
 #include "DCItem.h"
 #include "DCEnemy.h"
 #include "EngineUtils.h"
 #include "DCPlayerController.h"
 #include "DCGameUIWidget.h"
+#include "DCWeatherComponent.h"
 
 FName ADCCharacter::RightFootIKSocket(TEXT("RightFootIKSocket"));
 FName ADCCharacter::LeftFootIKSocket(TEXT("LeftFootIKSocket"));
 
-ADCCharacter::ADCCharacter() {
-
-	// Set size for collision capsule
+ADCCharacter::ADCCharacter()
+{
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
 	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &ADCCharacter::OnCollision);
 
@@ -45,8 +46,10 @@ ADCCharacter::ADCCharacter() {
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
-	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
-	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
+	WeatherComponent = CreateDefaultSubobject<UDCWeatherComponent>(TEXT("Weather Component"));
+	WeatherComponent->SetupAttachment(RootComponent);
+
+	/* IK */
 	IKInterpSpeed = 15.0f;
 	IKTraceDistance = 50.0f;
 	Scale = 0;
@@ -72,12 +75,16 @@ void ADCCharacter::Tick(float DeltaSeconds)
 
 	IKOffsetLeftFoot = FMath::FInterpTo(IKOffsetLeftFoot, IKFootTrace(IKTraceDistance, ADCCharacter::LeftFootIKSocket), DeltaSeconds, IKInterpSpeed);
 
-	/* Targting */
-	if (bIsLockedOn) {
+	/* Targeting */
+	if (bIsLockedOn)
+	{
 		float EnemyDistance = FVector::Dist(GetActorLocation(), LockOnTarget->GetActorLocation());
-		if (LockOnTarget == NULL || LockOnTarget->IsPendingKill() || (EnemyDistance > (LOCKON_RADIUS * 1.2))) {
+		if (LockOnTarget == NULL || LockOnTarget->IsPendingKill() || (EnemyDistance > (LOCKON_RADIUS * 1.2)))
+		{
 			bIsLockedOn = false;
-		} else {
+		} 
+		else 
+		{
 			// aim Character at current enemy
 			FVector EnemyLocation = LockOnTarget->GetActorLocation();
 			FVector MyLocation = GetActorLocation();
@@ -92,10 +99,11 @@ void ADCCharacter::Tick(float DeltaSeconds)
 //////////////////////////////////////////////////////////////////////////
 // Input
 
-void ADCCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) {
+void ADCCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
+{
 	// Set up gameplay key bindings
 	check(PlayerInputComponent);
-	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
+	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ADCCharacter::Jump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &ADCCharacter::MoveForward);
@@ -117,6 +125,7 @@ void ADCCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputC
 
 	/** Equippable Attacks */
 	InputComponent->BindAction("Attack", IE_Pressed, this, &ADCCharacter::Attack);
+	InputComponent->BindAction("Open", IE_Pressed, this, &ADCCharacter::Open);
 }
 
 void ADCCharacter::OnConstruction(const FTransform& Transform)
@@ -224,14 +233,18 @@ void ADCCharacter::ProcessLoot(TArray<TSubclassOf<ADCItem>> lootItems)
 	}
 }
 
-void ADCCharacter::Attack() {
-	if (GetController() && GetController()->IsA(ADCPlayerController::StaticClass())) {
+void ADCCharacter::Attack()
+{
+	if (GetController() && GetController()->IsA(ADCPlayerController::StaticClass())) 
+	{
 		ADCMeleeWeapon* CurrentWeapon = Cast<ADCMeleeWeapon>(Cast<ADCPlayerController>(GetController())->GetCurrentEquipment()[ESlotType::RightWeapon]);
-		if (CurrentWeapon != NULL && ActionState == ECharState::I) {
+		if (CurrentWeapon != NULL && ActionState == ECharState::I) 
+		{
 			ActionState = ECharState::A;
 
 			UBoxComponent* EquippableCollision = CurrentWeapon->GetCollisionComp();
-			if (EquippableCollision) {
+			if (EquippableCollision)
+			{
 				CurrentWeapon->GetCollisionComp()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 			}
 			EndAttack();
@@ -255,18 +268,25 @@ void ADCCharacter::EndAttack() {
 	}
 }
 
-void ADCCharacter::LockOn() {
-	if (bIsLockedOn) {
+void ADCCharacter::LockOn() 
+{
+	if (bIsLockedOn) 
+	{
 		bIsLockedOn = false;
 		LockOnTarget = NULL;
-	} else {
+	}
+	else 
+	{
 		float ClosestDistance = LOCKON_RADIUS;
-		for (TActorIterator<ADCEnemy> ActorItr(GetWorld()); ActorItr; ++ActorItr) {
+		for (TActorIterator<ADCEnemy> ActorItr(GetWorld()); ActorItr; ++ActorItr) 
+		{
 			ADCEnemy* Enemy = *ActorItr;
 			float EnemyDistance = FVector::Dist(GetActorLocation(), Enemy->GetActorLocation());
 
-			if (EnemyDistance < LOCKON_RADIUS) {
-				if (EnemyDistance < ClosestDistance) {
+			if (EnemyDistance < LOCKON_RADIUS)
+			{
+				if (EnemyDistance < ClosestDistance)
+				{
 					ClosestDistance = EnemyDistance;
 					LockOnTarget = Enemy;
 				}
@@ -275,22 +295,41 @@ void ADCCharacter::LockOn() {
 
 		// in future, prioritize best target
 		// currently will get the closest one
-		if (LockOnTarget != NULL) {
+		if (LockOnTarget != NULL)
+		{
 			bIsLockedOn = true;
 			UE_LOG(LogTemp, Warning, TEXT("%s"), *LockOnTarget->GetName());
 		}
 	}
 }
 
-UAnimationAsset* ADCCharacter::GetUIAnimation() {
+UAnimationAsset* ADCCharacter::GetUIAnimation()
+{
 	return UI_Animation;
 }
 
-void ADCCharacter::OnCollision(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult) {
-	if (OtherActor->IsA(ADCLoot::StaticClass())) {
+void ADCCharacter::Open()
+{
+	if (FocusedChest)
+	{
+		ProcessLoot(FocusedChest->GetLootContents());
+		FocusedChest->LootChest();
+	}
+}
 
+void ADCCharacter::Jump()
+{
+	if (!FocusedChest)
+	{
+		Super::Jump();
+	}
+}
+
+void ADCCharacter::OnCollision(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
+{
+	if (OtherActor->IsA(ADCLoot::StaticClass()))
+	{
 		ProcessLoot(Cast<ADCLoot>(OtherActor)->GetLootContents());
-
 		OtherActor->Destroy();
 	}
 }

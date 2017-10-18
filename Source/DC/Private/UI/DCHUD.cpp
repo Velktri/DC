@@ -8,9 +8,7 @@
 ADCHUD::ADCHUD() {
 	static ConstructorHelpers::FObjectFinder<UMaterial> CharacterRenderImageObj(TEXT("/Game/UI/Scene_Capture/UI_RenderView.UI_RenderView"));
 
-
 	CharacterRenderImage = CharacterRenderImageObj.Object;
-
 	bHUDVisible = true;
 }
 

@@ -11,19 +11,23 @@
 #include "DCCharacter.h"
 
 
-ADCEnemyAIController::ADCEnemyAIController() {
+ADCEnemyAIController::ADCEnemyAIController()
+{
 	BlackboardComp = CreateDefaultSubobject<UBlackboardComponent>(TEXT("BlackBoardComp"));
 	BehaviorComp = CreateDefaultSubobject<UBehaviorTreeComponent>(TEXT("BehaviorComp"));
 }
 
-void ADCEnemyAIController::Possess(APawn* InPawn) {
+void ADCEnemyAIController::Possess(APawn* InPawn)
+{
 	Super::Possess(InPawn);
 
 	ADCEnemy* Bot = Cast<ADCEnemy>(InPawn);
 
 	// start behavior
-	if (Bot && Bot->BotBehavior) {
-		if (Bot->BotBehavior->BlackboardAsset) {
+	if (Bot && Bot->BotBehavior)
+	{
+		if (Bot->BotBehavior->BlackboardAsset)
+		{
 			BlackboardComp->InitializeBlackboard(*Bot->BotBehavior->BlackboardAsset);
 		}
 
@@ -33,16 +37,20 @@ void ADCEnemyAIController::Possess(APawn* InPawn) {
 	}
 }
 
-void ADCEnemyAIController::SetEnemy(class APawn* InPawn) {
-	if (BlackboardComp) {
+void ADCEnemyAIController::SetEnemy(class APawn* InPawn)
+{
+	if (BlackboardComp)
+	{
 		BlackboardComp->SetValue<UBlackboardKeyType_Object>(EnemyKeyID, InPawn);
 		SetFocus(InPawn);
 	}
 }
 
-void ADCEnemyAIController::FindMainCharacter() {
+void ADCEnemyAIController::FindMainCharacter()
+{
 	APawn* MyBot = GetPawn();
-	if (MyBot == NULL) {
+	if (MyBot == NULL)
+	{
 		return;
 	}
 
@@ -67,8 +75,10 @@ void ADCEnemyAIController::FindMainCharacter() {
 
 }
 
-ADCCharacter* ADCEnemyAIController::GetEnemy() const {
-	if (BlackboardComp) {
+ADCCharacter* ADCEnemyAIController::GetEnemy() const
+{
+	if (BlackboardComp)
+	{
 		return Cast<ADCCharacter>(BlackboardComp->GetValue<UBlackboardKeyType_Object>(EnemyKeyID));
 	}
 
